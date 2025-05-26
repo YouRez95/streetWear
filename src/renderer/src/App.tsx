@@ -1,16 +1,33 @@
-import { Button } from '@renderer/components/ui/button'
-import { AppLayout, Content, Sidebar } from './components/AppLayout'
+import { AppLayout, Content, ContentHeader, Sidebar } from '@renderer/components/layouts/AppLayout'
+import { useEffect } from 'react'
+import { Outlet } from 'react-router-dom'
+import { Navbar } from './components/navbar'
+import { Toaster } from './components/ui/toaster'
+import { useUserStore } from './store'
 
 function App() {
+  const { setLogout } = useUserStore()
+
+  useEffect(() => {
+    if (window.context?.onForceLogout) {
+      window.context.onForceLogout(async () => {
+        console.log('Force logout triggered')
+        setLogout()
+        await window.context.logoutUser()
+      })
+    }
+  }, [])
+
   return (
     <AppLayout className="">
-      <Sidebar className="bg-blue-500">Sidebar</Sidebar>
-      <Content className="bg-slate-300 flex items-center justify-center flex-col">
-        <Button variant={'ghost'}>ghost</Button>
-        <Button variant={'outline'}>outline</Button>
-        <Button variant={'default'}>secondary</Button>
-        <Button variant={'destructive'}>destructive</Button>
+      <Sidebar className="flex flex-col items-center justify-center">
+        <Navbar />
+      </Sidebar>
+      <Content className="flex items-center justify-center flex-col m-2 mb-4 gap-2">
+        <ContentHeader className="" />
+        <Outlet />
       </Content>
+      <Toaster />
     </AppLayout>
   )
 }

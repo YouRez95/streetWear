@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/renderer/src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: ['class'],
   theme: {
     container: {
       center: true,
@@ -11,8 +12,11 @@ module.exports = {
     },
     extend: {
       colors: {
+        gradient: 'var(--gradient)',
         border: 'hsl(var(--border))',
+        tableHead: 'rgb(var(--table-head) / 10%)',
         input: 'hsl(var(--input))',
+        success: 'hsl(var(--success))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
