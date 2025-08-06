@@ -1,0 +1,85 @@
+declare global {
+  interface Window {
+    context: {
+      onForceLogout: (callback: () => void) => void
+      loginUser: LoginUser
+      logoutUser: LogoutUser
+      getFromStore: <K extends keyof StoreSchema>(key: K) => Promise<StoreSchema[K]>
+      getUsers: GetUsers
+      createUser: CreateUser
+      deleteUser: DeleteUser
+      updateUser: UpdateUser
+      getFaconniers: GetFaconniers
+      createFaconnier: CreateFaconnier
+      deleteFaconnier: DeleteFaconnier
+      updateFaconnierStatus: UpdateFaconnierStatus
+      updateFaconnier: UpdateFaconnier
+      getClients: GetClients
+      createClient: CreateClient
+      deleteClient: DeleteClient
+      updateClient: UpdateClient
+      updateClientStatus: UpdateClientStatus
+      getSeasons: GetSeasons
+      createSeason: CreateSeason
+      deleteSeason: DeleteSeason
+      updateSeason: UpdateSeason
+      toggleSeason: ToggleSeason
+      getProducts: GetProducts
+      createProduct: CreateProduct
+      updateProduct: UpdateProduct
+      deleteProduct: DeleteProduct
+      getAllProductsStatus: GetAllProductsStatus
+      getActiveFaconniers: GetActiveFaconniers
+      createBonFaconnier: CreateBonFaconnier
+      createOrderFaconnier: CreateOrderFaconnier
+      getOrdersFaconnier: GetOrdersFaconnier
+      createAvanceFaconnier: CreateAvanceFaconnier
+      getFaconnierSummary: GetFaconnierSummary
+      updateOrderFaconnier: UpdateOrderFaconnier
+      deleteAvanceFaconnier: DeleteAvanceFaconnier
+      deleteOrderFaconnier: DeleteOrderFaconnier
+      toggleBonFaconnier: ToggleBonFaconnier
+      deleteBonFaconnier: DeleteBonFaconnier
+      getGeneralSettings: GetGeneralSettings
+      createStylist: CreateStylist
+      getStylists: GetStylists
+      updateStylistStatus: UpdateStylistStatus
+      updateStylist: UpdateStylist
+      deleteStylist: DeleteStylist
+      getActiveStylists: GetActiveStylists
+      createBonStylist: CreateBonStylist
+      createOrderStylist: CreateOrderStylist
+      downloadBon: DownloadBon
+      downloadExcelBon: DownloadExcelBon
+      createAvanceStylist: CreateAvanceStylist
+      getOrdersStylist: GetOrdersStylist
+      updateOrderStylist: UpdateOrderStylist
+      deleteOrderStylist: DeleteOrderStylist
+      deleteAvanceStylist: DeleteAvanceStylist
+      toggleBonStylist: ToggleBonStylist
+      deleteBonStylist: DeleteBonStylist
+      getStylistSummary: GetStylistSummary
+      getActiveClients: GetActiveClients
+      createBonClient: CreateBonClient
+      createOrderClient: CreateOrderClient
+      createMultipleOrdersClient: CreateMultipleOrdersClient
+      getOrdersClient: GetOrdersClient
+      createAvanceClient: CreateAvanceClient
+      getClientSummary: GetClientSummary
+      deleteBonClient: DeleteBonClient
+      deleteOrderClient: DeleteOrderClient
+      deleteAvanceClient: DeleteAvanceClient
+      toggleBonClient: ToggleBonClient
+      updateOrderClient: UpdateOrderClient
+      getSummary: GetSummary
+      getRetardOrdersFaconnier: GetRetardOrdersFaconnier
+      getReturnStock: GetReturnStock
+      deleteClientReturnStock: DeleteClientReturnStock
+      updateClientReturnStock: UpdateClientReturnStock
+      getSummaryReturnStock: GetSummaryReturnStock
+      createOrderClientFromReturnStock: CreateOrderClientFromReturnStock
+    }
+  }
+}
+
+export {}
