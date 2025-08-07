@@ -121,7 +121,7 @@ export default function FaconnierContentHeader({
         {/* Bon Status */}
         {selectedBon && (
           <div className="text-sm font-semibold bg-yellow-300 p-2 rounded-md">
-            {selectedBon?.bonStatus === 'OPEN' && 'Bon actif'}
+            {selectedBon?.bonStatus === 'OPEN' && 'Bon ouvert'}
             {selectedBon?.bonStatus === 'CLOSED' && 'Bon fermé'}
           </div>
         )}

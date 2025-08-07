@@ -75,7 +75,7 @@ export const OpenBonDialog = ({
         <DialogHeader>
           <DialogTitle className="text-xl">Ouvrir le bon</DialogTitle>
           <DialogDescription className="text-background text-base">
-            Veuillez saisir le code pour ouvrir le bon.
+           Pour ouvrir le bon, veuillez entrer le code "Ouvrir".
           </DialogDescription>
         </DialogHeader>
 

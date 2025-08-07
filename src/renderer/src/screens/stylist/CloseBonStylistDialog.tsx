@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useToggleBonStylist } from '@renderer/hooks/useStylist'
+import { useStylistSummary, useToggleBonStylist } from '@renderer/hooks/useStylist'
 import { cn } from '@renderer/lib/utils'
 import { useState } from 'react'
 
@@ -26,11 +26,31 @@ export const CloseBonStylistDialog = ({
   open,
   setOpen,
   selectedBonId,
+  selectedStylistId,
   setSelectedBonId
 }: CloseBonStylistDialogProps) => {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const { mutate: toggleBonStylist } = useToggleBonStylist()
+  const {data: dataSummary} = useStylistSummary(selectedStylistId, selectedBonId)
+
+function showMessage() {
+  if (dataSummary?.summary?.totalAdvances !== undefined &&
+      dataSummary?.summary?.totalValueSent !== undefined &&
+      dataSummary.summary.totalValueSent - dataSummary.summary.totalAdvances > 0) {
+    return (
+      <p className="text-destructive">
+        Ce bon n'est pas complet. Êtes-vous sûr de vouloir le fermer ?
+      </p>
+    )
+  }
+
+  return (
+    <p className="text-success">
+      Le bon est complet. Vous pouvez le fermer.
+    </p>
+  )
+}
 
   function handleChangeCode(e: React.ChangeEvent<HTMLInputElement>) {
     setCode(e.target.value)
@@ -80,6 +100,7 @@ export const CloseBonStylistDialog = ({
           <DialogDescription className="text-background text-base">
             Pour fermer le bon, veuillez entrer le code "Fermer".
           </DialogDescription>
+           {showMessage()}
         </DialogHeader>
 
         <div className="flex items-center gap-4 ">

@@ -33,21 +33,23 @@ export const CloseBonDialog = ({
   const [error, setError] = useState('')
   const { data: dataSummary } = useClientSummary(selectedClientId, selectedBonId)
   const { mutate: toggleBonClient } = useToggleBonClient()
-  function showMessage() {
-    if (
+function showMessage() {
+  if (dataSummary?.summary?.totalAdvances !== undefined &&
       dataSummary?.summary?.totalValueSent !== undefined &&
-      dataSummary?.summary?.totalAdvances !== undefined &&
-      dataSummary?.summary?.totalValueSent > dataSummary?.summary?.totalAdvances
-    ) {
-      return (
-        <p className="text-red-500">
-          Ce bon n'est pas complet. Êtes-vous sûr de vouloir le fermer ?
-        </p>
-      )
-    }
-
-    return <p className="">Êtes-vous sûr de vouloir fermer ce bon ?</p>
+      dataSummary.summary.totalValueSent - dataSummary.summary.totalAdvances > 0) {
+    return (
+      <p className="text-destructive">
+        Ce bon n'est pas complet. Êtes-vous sûr de vouloir le fermer ?
+      </p>
+    )
   }
+
+  return (
+    <p className="text-success">
+      Le bon est complet. Vous pouvez le fermer.
+    </p>
+  )
+}
 
   function handleChangeCode(e: React.ChangeEvent<HTMLInputElement>) {
     setCode(e.target.value)
@@ -93,9 +95,10 @@ export const CloseBonDialog = ({
       <DialogContent className="bg-foreground rounded-xl p-5 shadow-sm border space-y-3">
         <DialogHeader>
           <DialogTitle className="text-xl">Fermer le bon</DialogTitle>
-          <DialogDescription asChild className="text-background text-base">
-            {showMessage()}
+          <DialogDescription className="text-background text-base">
+            Pour fermer le bon, veuillez entrer le code "Fermer".
           </DialogDescription>
+           {showMessage()}
         </DialogHeader>
 
         <div className="flex items-center gap-4 ">

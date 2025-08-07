@@ -18,8 +18,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      refetchOnWindowFocus: false,
-      staleTime: 60 * 1000, // 1 minute as default stale time
+      refetchOnWindowFocus: true,
+      staleTime: 0, // 1 minute as default stale time
       gcTime: 5 * 60 * 1000 // 5 minutes as default cache time
     }
   }
