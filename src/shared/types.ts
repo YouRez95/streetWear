@@ -289,14 +289,11 @@ type ToggleBonStylist = (
   closeBon: boolean
 ) => Promise<ToggleBonStylistResponse>
 
-type ToggleBonClient = (
-  bonId: string,
-  seasonId: string,
-  openBon: boolean,
-  closeBon: boolean
-) => Promise<ToggleBonClientResponse>
+type ToggleBonClient = (toggleBonData: ToggleBonClientInput) => Promise<ToggleBonClientResponse>
 
 type DeleteBonFaconnier = (bonId: string, seasonId: string) => Promise<DeleteBonFaconnierResponse>
+
+type CancelOrderFaconnier = (orderId: string) => Promise<CancelOrderFaconnierResponse>
 
 type DeleteBonStylist = (bonId: string, seasonId: string) => Promise<DeleteBonStylistResponse>
 
@@ -312,3 +309,180 @@ type GetRetardOrdersFaconnier = (seasonId: string) => Promise<GetRetardOrdersFac
 type DownloadBon = (buffer: ArrayBuffer, defaultName: string) => Promise<void>
 
 type DownloadExcelBon = (bonId: string, type: 'faconnier' | 'stylist' | 'client') => Promise<void>
+
+// Workers Types
+type CreateWorkPlace = (
+  workPlaceData: Omit<CreateWorkPlaceInput, 'id'>
+) => Promise<CreateWorkPlaceResponse>
+
+type GetWorkPlacesByCursor = ({
+  take,
+  cursor,
+  search
+}: {
+  take: number
+  cursor: string
+  search: string
+}) => Promise<{
+  status: 'success' | 'failed'
+  message: string
+  workplaces: WorkPlace[]
+  nextCursor: string | null
+}>
+
+type GetWorkPlaces = (
+  page: number,
+  limit: number,
+  search: string
+) => Promise<{
+  status: 'success' | 'failed'
+  message: string
+  workplaces: WorkPlace[]
+  currentPage: number
+  totalPages: number
+}>
+
+type UpdateWorkplace = (workPlaceData: CreateWorkPlaceInput) => Promise<CreateWorkPlaceResponse>
+type DeleteWorkplace = (workplaceId: string) => Promise<CreateWorkPlaceResponse>
+
+type CreateWorker = (workerData: Omit<CreateWorkerInput, 'id'>) => Promise<CreateWorkerResponse>
+type GetWorkers = (
+  page: number,
+  limit: number,
+  search: string
+) => Promise<{
+  status: 'success' | 'failed'
+  message: string
+  workers: GetWorkersResponse[]
+  currentPage: number
+  totalPages: number
+}>
+
+type UpdateWorker = (workerData: UpdateWorkerInput) => Promise<CreateWorkerResponse>
+type DeleteWorker = (workerId: string) => Promise<CreateWorkerResponse>
+
+type GetWorkersByCursor = ({
+  take,
+  cursor,
+  search
+}: {
+  take: number
+  cursor: string
+  search: string
+}) => Promise<{
+  status: 'success' | 'failed'
+  message: string
+  workers: (WorkerData & { workplace: { id: string; name: string } })[]
+  nextCursor: string | null
+}>
+
+type UpdateWorkerStatus = (workerId: string, isActive: boolean) => Promise<CreateWorkerResponse>
+
+type GetWeeksByCursor = ({
+  workplaceId,
+  take,
+  cursor,
+  search
+}: {
+  workplaceId: string
+  take: number
+  cursor: string
+  search: string
+}) => Promise<{
+  status: 'success' | 'failed'
+  message: string
+  weeks: Week[]
+  nextCursor: string | null
+}>
+
+type CreateWeek = ({
+  weekStart,
+  workplaceId
+}: {
+  weekStart: string
+  workplaceId: string
+}) => Promise<CreateWeekResponse>
+type UpdateWeek = ({
+  weekStart,
+  weekId
+}: {
+  weekStart: string
+  weekId: string
+}) => Promise<CreateWeekResponse>
+
+type DeleteWeek = ({
+  weekId,
+  workplaceId
+}: {
+  weekId: string
+  workplaceId: string
+}) => Promise<DeleteWeekResponse>
+
+type GetWeekRecords = ({
+  weekId,
+  workplaceId
+}: GetWeeksRecordsInput) => Promise<GetWeekRecordsResponse>
+
+type UpdateWeekRecord = (recordData: UpdateWeekRecordInput) => Promise<UpdateWeekRecordResponse>
+
+type UpdateWeekRecordPayment = (
+  recordData: UpdateWeekRecordPaymentInput
+) => Promise<UpdateWeekRecordResponse>
+
+type CreateWeekRecord = ({
+  weekId,
+  workerId
+}: {
+  weekId: string
+  workerId: string
+}) => Promise<UpdateWeekRecordResponse>
+
+type DeleteWeekRecord = (recordId: string) => Promise<UpdateWeekRecordResponse>
+
+type GetYearSummary = ({
+  year,
+  workplaceId
+}: GetYearSummaryInput) => Promise<GetYearSummaryResponse>
+
+type Year = {
+  id: string
+  year: number
+  displayText: string
+}
+
+type GetYearByCursor = ({
+  workplaceId,
+  take,
+  cursor,
+  search
+}: {
+  workplaceId: string
+  take: number
+  cursor: string
+  search: string
+}) => Promise<{
+  status: 'success' | 'failed'
+  message: string
+  years: Year[]
+  nextCursor: string | null
+}>
+
+type GetSummaryWorkers = ({
+  weekId,
+  workplaceId
+}: {
+  weekId: string
+  workplaceId: string
+}) => Promise<GetSummaryWorkersResponse>
+
+type GetSummaryWorker = (workerId: string) => Promise<GetSummaryWorkerResponse>
+
+type GetWorkerRecords = ({
+  limit,
+  page,
+  workerId
+}: {
+  workerId: string
+  page: number
+  limit: number
+}) => Promise<GetWorkerRecordsResponse>

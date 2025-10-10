@@ -144,5 +144,13 @@ export const faconnierService = {
       console.error('Error deleting bon faconnier:', error)
       throw error
     }
+  },
+  cancelOrderFaconnier: async (orderId: string) => {
+    try {
+      return await window.context.cancelOrderFaconnier(orderId)
+    } catch (error) {
+      console.error('Error canceling order faconnier:', error)
+      throw error
+    }
   }
 }

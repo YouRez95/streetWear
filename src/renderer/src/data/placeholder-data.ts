@@ -589,3 +589,144 @@ export const ordersClient = {
     }
   ]
 }
+
+export const summaryYear = {
+  status: 'success',
+  message: 'Year summary fetched successfully',
+  records: [
+    {
+      name: 'janvier',
+      weeks: [
+        { weekText: 'du 01/01 au 06/01', totalAmount: 1200.5 },
+        { weekText: 'du 07/01 au 12/01', totalAmount: 980.25 },
+        { weekText: 'du 13/01 au 18/01', totalAmount: 1120.75 },
+        { weekText: 'du 19/01 au 24/01', totalAmount: 1345.0 },
+        { weekText: 'du 25/01 au 30/01', totalAmount: 1100.0 }
+      ],
+      totalAmount: 5746.5
+    },
+    {
+      name: 'février',
+      weeks: [
+        { weekText: 'du 01/02 au 06/02', totalAmount: 1020.0 },
+        { weekText: 'du 07/02 au 12/02', totalAmount: 1150.75 },
+        { weekText: 'du 13/02 au 18/02', totalAmount: 980.5 },
+        { weekText: 'du 19/02 au 24/02', totalAmount: 1250.0 },
+        { weekText: 'du 25/02 au 28/02', totalAmount: 600.25 }
+      ],
+      totalAmount: 5501.5
+    },
+    {
+      name: 'mars',
+      weeks: [
+        { weekText: 'du 01/03 au 06/03', totalAmount: 1340.0 },
+        { weekText: 'du 07/03 au 12/03', totalAmount: 1475.5 },
+        { weekText: 'du 13/03 au 18/03', totalAmount: 1200.0 },
+        { weekText: 'du 19/03 au 24/03', totalAmount: 1580.25 },
+        { weekText: 'du 25/03 au 30/03', totalAmount: 1420.0 }
+      ],
+      totalAmount: 7015.75
+    },
+    {
+      name: 'avril',
+      weeks: [
+        { weekText: 'du 01/04 au 06/04', totalAmount: 1100.0 },
+        { weekText: 'du 07/04 au 12/04', totalAmount: 950.5 },
+        { weekText: 'du 13/04 au 18/04', totalAmount: 1230.75 },
+        { weekText: 'du 19/04 au 24/04', totalAmount: 1080.0 },
+        { weekText: 'du 25/04 au 30/04', totalAmount: 970.25 }
+      ],
+      totalAmount: 5331.5
+    },
+    {
+      name: 'mai',
+      weeks: [
+        { weekText: 'du 01/05 au 06/05', totalAmount: 1400.0 },
+        { weekText: 'du 07/05 au 12/05', totalAmount: 1250.0 },
+        { weekText: 'du 13/05 au 18/05', totalAmount: 1320.25 },
+        { weekText: 'du 19/05 au 24/05', totalAmount: 1100.0 },
+        { weekText: 'du 25/05 au 30/05', totalAmount: 1180.75 }
+      ],
+      totalAmount: 6251.0
+    },
+    {
+      name: 'juin',
+      weeks: [
+        { weekText: 'du 01/06 au 06/06', totalAmount: 1150.0 },
+        { weekText: 'du 07/06 au 12/06', totalAmount: 980.5 },
+        { weekText: 'du 13/06 au 18/06', totalAmount: 1230.0 },
+        { weekText: 'du 19/06 au 24/06', totalAmount: 1400.75 },
+        { weekText: 'du 25/06 au 30/06', totalAmount: 1100.0 }
+      ],
+      totalAmount: 5861.25
+    },
+    {
+      name: 'juillet',
+      weeks: [
+        { weekText: 'du 01/07 au 06/07', totalAmount: 1300.0 },
+        { weekText: 'du 07/07 au 12/07', totalAmount: 1450.5 },
+        { weekText: 'du 13/07 au 18/07', totalAmount: 1200.75 },
+        { weekText: 'du 19/07 au 24/07', totalAmount: 1350.0 },
+        { weekText: 'du 25/07 au 30/07', totalAmount: 1250.25 }
+      ],
+      totalAmount: 6551.5
+    },
+    {
+      name: 'août',
+      weeks: [
+        { weekText: 'du 01/08 au 06/08', totalAmount: 1400.0 },
+        { weekText: 'du 07/08 au 12/08', totalAmount: 1300.75 },
+        { weekText: 'du 13/08 au 18/08', totalAmount: 1500.5 },
+        { weekText: 'du 19/08 au 24/08', totalAmount: 1600.0 },
+        { weekText: 'du 25/08 au 30/08', totalAmount: 1450.25 }
+      ],
+      totalAmount: 7251.5
+    },
+    {
+      name: 'septembre',
+      weeks: [
+        { weekText: 'du 01/09 au 06/09', totalAmount: 1200.0 },
+        { weekText: 'du 07/09 au 12/09', totalAmount: 1100.5 },
+        { weekText: 'du 13/09 au 18/09', totalAmount: 1300.75 },
+        { weekText: 'du 19/09 au 24/09', totalAmount: 1250.0 },
+        { weekText: 'du 25/09 au 30/09', totalAmount: 1150.25 }
+      ],
+      totalAmount: 6001.5
+    },
+    {
+      name: 'octobre',
+      weeks: [
+        { weekText: 'du 01/09 au 06/09', totalAmount: 1200.0 },
+        { weekText: 'du 07/09 au 12/09', totalAmount: 1100.5 },
+        { weekText: 'du 13/09 au 18/09', totalAmount: 1300.75 },
+        { weekText: 'du 19/09 au 24/09', totalAmount: 1250.0 },
+        { weekText: 'du 25/09 au 30/09', totalAmount: 1150.25 }
+      ],
+      totalAmount: 6001.5
+    },
+    {
+      name: 'novembre',
+      weeks: [
+        { weekText: 'du 01/09 au 06/09', totalAmount: 1200.0 },
+        { weekText: 'du 07/09 au 12/09', totalAmount: 1100.5 },
+        { weekText: 'du 13/09 au 18/09', totalAmount: 1300.75 },
+        { weekText: 'du 19/09 au 24/09', totalAmount: 1250.0 },
+        { weekText: 'du 25/09 au 30/09', totalAmount: 1150.25 }
+      ],
+      totalAmount: 6001.5
+    },
+    {
+      name: 'decembre',
+      weeks: [
+        { weekText: 'du 01/09 au 06/09', totalAmount: 1200.0 },
+        { weekText: 'du 07/09 au 12/09', totalAmount: 1100.5 },
+        { weekText: 'du 13/09 au 18/09', totalAmount: 1300.75 },
+        { weekText: 'du 19/09 au 24/09', totalAmount: 1250.0 },
+        { weekText: 'du 25/09 au 30/09', totalAmount: 1150.25 }
+      ],
+      totalAmount: 6001.5
+    }
+  ],
+  nextYear: null,
+  prevYear: null
+}

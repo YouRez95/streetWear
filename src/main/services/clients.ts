@@ -346,10 +346,13 @@ export const deleteOrderClient: DeleteOrderClient = async (orderId, seasonId) =>
   }
 }
 
-export const toggleBonClient: ToggleBonClient = async (bonId, seasonId, openBon, closeBon) => {
+export const toggleBonClient: ToggleBonClient = async (toggleData) => {
+  const { bonId, closeBon, openBon, seasonId, remise } = toggleData
+
   try {
     const result = await apiClient.patch(
-      `/api/v1/client/bon/${seasonId}/${bonId}?openBon=${openBon}&closeBon=${closeBon}`
+      `/api/v1/client/bon/${seasonId}/${bonId}?openBon=${openBon}&closeBon=${closeBon}`,
+      { remise: remise ? remise : 0 }
     )
     //console.log('Open bon client result:', result)
     return result.data

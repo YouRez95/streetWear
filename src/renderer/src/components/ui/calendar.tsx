@@ -1,5 +1,6 @@
 'use client'
 
+import { fr } from 'date-fns/locale'
 import * as React from 'react'
 import { DayPicker, getDefaultClassNames } from 'react-day-picker'
 
@@ -15,6 +16,8 @@ function Calendar({
   const defaultClassNames = getDefaultClassNames()
   return (
     <DayPicker
+      locale={fr}
+      weekStartsOn={1}
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
       classNames={{

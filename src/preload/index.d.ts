@@ -78,6 +78,32 @@ declare global {
       updateClientReturnStock: UpdateClientReturnStock
       getSummaryReturnStock: GetSummaryReturnStock
       createOrderClientFromReturnStock: CreateOrderClientFromReturnStock
+      createWorkPlace: CreateWorkPlace
+      getWorkPlaces: GetWorkPlaces
+      getWorkplacesByCursor: GetWorkPlacesByCursor
+      updateWorkplace: UpdateWorkplace
+      deleteWorkplace: DeleteWorkplace
+      createWorker: CreateWorker
+      getWorkers: GetWorkers
+      updateWorker: UpdateWorker
+      deleteWorker: DeleteWorker
+      getWorkersCursor: GetWorkersByCursor
+      updateWorkerStatus: UpdateWorkerStatus
+      getWeeksByCursor: GetWeeksByCursor
+      createWeek: CreateWeek
+      updateWeek: UpdateWeek
+      updateWeekRecordPayment: UpdateWeekRecordPayment
+      deleteWeek: DeleteWeek
+      getWeekRecords: GetWeekRecords
+      updateWeekRecord: UpdateWeekRecord
+      deleteWeekRecord: DeleteWeekRecord
+      createWeekRecord: CreateWeekRecord
+      getYearSummary: GetYearSummary
+      getYearsByCursor: GetYearByCursor
+      getSummaryWorkers: GetSummaryWorkers
+      getWorkerRecords: GetWorkerRecords
+      getSummaryWorker: GetSummaryWorker
+      cancelOrderFaconnier: CancelOrderFaconnier
     }
   }
 }

@@ -11,8 +11,10 @@ import { createRoot } from 'react-dom/client'
 import { createHashRouter, RouterProvider } from 'react-router-dom'
 import App from './App'
 import './assets/main.css'
+import { ErrorPage } from './screens/errors'
 import StockReturn from './screens/stockReturn'
 import Stylists from './screens/stylist'
+import Workers from './screens/workers'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,10 +61,15 @@ const router = createHashRouter([
           {
             path: '/stock-return',
             element: <StockReturn />
+          },
+          {
+            path: '/workers',
+            element: <Workers />
           }
         ]
       }
-    ]
+    ],
+    errorElement: <ErrorPage />
   }
 ])
 

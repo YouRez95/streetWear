@@ -14,6 +14,8 @@ import TabSeasons from './seasonSettings/TabSeasons'
 import SettingsHeader from './SettingsHeader'
 import TabStylists from './stylistSettings/TabStylists'
 import TabUsers from './userSettings/TabUsers'
+import TabWorkers from './workersSettings/TabWorkers'
+import TabWorkPlace from './workPlaceSettings/TabWorkPlace'
 
 export default function Settings() {
   // WIP: Filter tabs based on user role
@@ -23,6 +25,8 @@ export default function Settings() {
 
   const TabsListItems = [
     { id: 'Users', name: 'Utilisateurs', content: <TabUsers /> },
+    { id: 'WorkPlace', name: 'Atelier', content: <TabWorkPlace /> },
+    { id: 'Workers', name: 'Employés', content: <TabWorkers /> },
     { id: 'Stylists', name: 'Stylists', content: <TabStylists /> },
     { id: 'Faconniers', name: 'Faconniers', content: <TabFaconniers /> },
     { id: 'Clients', name: 'Clients', content: <TabClients /> },
