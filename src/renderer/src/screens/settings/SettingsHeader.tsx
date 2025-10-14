@@ -6,7 +6,7 @@ const iconMap: Record<string, JSX.Element> = {
   users: <Users className="w-6 h-6 text-muted-foreground" />,
   faconniers: <Building className="w-6 h-6 text-muted-foreground" />,
   clients: <User className="w-6 h-6 text-muted-foreground" />,
-  tailors: <Scissors className="w-6 h-6 text-muted-foreground" />,
+  stylists: <Scissors className="w-6 h-6 text-muted-foreground" />,
   seasons: <Calendar className="w-6 h-6 text-muted-foreground" />
 }
 

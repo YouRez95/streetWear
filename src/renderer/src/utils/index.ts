@@ -158,3 +158,16 @@ export const generateFileName = (
   const product = cleanText(order.productName || 'Produit')
   return `${date}_BON_Commande_${bon}_${product}.pdf`
 }
+
+export function parseWeekNameToDate(weekName: string | null): Date | undefined {
+  if (!weekName) return undefined
+
+  const match = weekName.match(/du (\d{2}\/\d{2}\/\d{4}) au (\d{2}\/\d{2}\/\d{4})/)
+  if (!match) return undefined
+
+  const [, start] = match // start = "01/09/2025"
+  const [day, month, year] = start.split('/').map(Number)
+
+  // Return as Date (local midnight)
+  return new Date(year, month - 1, day)
+}

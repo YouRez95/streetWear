@@ -25,6 +25,7 @@ import {
 } from './services/clients'
 import { getGeneralSettings, getRetardOrdersFaconnier, getSummary } from './services/dashboard'
 import {
+  cancelOrderFaconnier,
   createAvanceFaconnier,
   createBonFaconnier,
   createFaconnier,
@@ -82,6 +83,33 @@ import {
   updateStylistStatus
 } from './services/stylists'
 import { createUser, deleteUser, getUsers, updateUser } from './services/users'
+import {
+  createWeek,
+  createWeekRecord,
+  createWorker,
+  createWorkPlace,
+  deleteWeek,
+  deleteWeekRecord,
+  deleteWorker,
+  deleteWorkplace,
+  getSummaryWorker,
+  getSummaryWorkers,
+  getWeekRecords,
+  getWeeksByCursor,
+  getWorkerRecords,
+  getWorkers,
+  getWorkersCursor,
+  getWorkPlaces,
+  getWorkPlacesByCursor,
+  getYearsByCursor,
+  getYearSummary,
+  updateWeek,
+  updateWeekRecord,
+  updateWeekRecordPayment,
+  updateWorker,
+  updateWorkerStatus,
+  updateWorkplace
+} from './services/workers'
 import { getFromStore } from './store/store'
 import { setMainWindow } from './utils/windowManager'
 
@@ -92,9 +120,9 @@ import { setMainWindow } from './utils/windowManager'
 
 // app.commandLine.appendSwitch('ignore-gpu-blacklist')
 // app.commandLine.appendSwitch('enable-gpu-rasterization')
-app.commandLine.appendSwitch("disable-features", "msHighDpiScaling");
-app.commandLine.appendSwitch("high-dpi-support", "1");
-app.commandLine.appendSwitch("force-device-scale-factor", "1");
+app.commandLine.appendSwitch('disable-features', 'msHighDpiScaling')
+app.commandLine.appendSwitch('high-dpi-support', '1')
+app.commandLine.appendSwitch('force-device-scale-factor', '1')
 
 function createWindow(): void {
   // Create the browser window.
@@ -155,15 +183,6 @@ app.whenReady().then(async () => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-  // async function testServer() {
-  //   try {
-  //     const response = await fetch(SERVER_URL)
-  //     const data = await response.json()
-  //     console.log('Server response:', data)
-  //   } catch (error) {
-  //     console.log('error', error)
-  //   }
-  // }
 
   // Login User IPC
   ipcMain.handle('loginUser', (_, ...args: Parameters<LoginUser>) => loginUser(...args))
@@ -446,6 +465,11 @@ app.whenReady().then(async () => {
     getFaconnierSummary(...args)
   )
 
+  // cancelOrderFaconnier IPC
+  ipcMain.handle('cancelOrderFaconnier', async (_, ...args: Parameters<CancelOrderFaconnier>) =>
+    cancelOrderFaconnier(...args)
+  )
+
   // Update Order Quantity Returned IPC
   ipcMain.handle('updateOrderFaconnier', async (_, ...args: Parameters<UpdateOrderFaconnier>) =>
     updateOrderFaconnier(...args)
@@ -520,6 +544,120 @@ app.whenReady().then(async () => {
     'createOrderClientFromReturnStock',
     async (_, ...args: Parameters<CreateOrderClientFromReturnStock>) =>
       createOrderClientFromReturnStock(...args)
+  )
+
+  // Create Workplace IPC
+  ipcMain.handle('createWorkPlace', async (_, ...args: Parameters<CreateWorkPlace>) =>
+    createWorkPlace(...args)
+  )
+
+  // Get Workplace IPC
+  ipcMain.handle('getWorkPlaces', async (_, ...args: Parameters<GetWorkPlaces>) =>
+    getWorkPlaces(...args)
+  )
+
+  // Get Workplace By Cursor IPC
+  ipcMain.handle('getWorkplacesByCursor', async (_, ...args: Parameters<GetWorkPlacesByCursor>) =>
+    getWorkPlacesByCursor(...args)
+  )
+
+  // Update workplace
+  ipcMain.handle('updateWorkplace', async (_, ...args: Parameters<UpdateWorkplace>) =>
+    updateWorkplace(...args)
+  )
+
+  // Delete workplace
+  ipcMain.handle('deleteWorkplace', async (_, ...args: Parameters<DeleteWorkplace>) =>
+    deleteWorkplace(...args)
+  )
+
+  // create worker
+  ipcMain.handle('createWorker', async (_, ...args: Parameters<CreateWorker>) =>
+    createWorker(...args)
+  )
+  // get workers
+  ipcMain.handle('getWorkers', async (_, ...args: Parameters<GetWorkers>) => getWorkers(...args))
+
+  // update workers
+  ipcMain.handle('updateWorker', async (_, ...args: Parameters<UpdateWorker>) =>
+    updateWorker(...args)
+  )
+
+  // delete worker
+  ipcMain.handle('deleteWorker', async (_, ...args: Parameters<DeleteWorker>) =>
+    deleteWorker(...args)
+  )
+
+  // get worker by cursor
+  ipcMain.handle('getWorkersCursor', async (_, ...args: Parameters<GetWorkersByCursor>) =>
+    getWorkersCursor(...args)
+  )
+
+  //update Worker Status
+  ipcMain.handle('updateWorkerStatus', async (_, ...args: Parameters<UpdateWorkerStatus>) =>
+    updateWorkerStatus(...args)
+  )
+
+  // Get weeks ipc
+  ipcMain.handle('getWeeksByCursor', async (_, ...args: Parameters<GetWeeksByCursor>) =>
+    getWeeksByCursor(...args)
+  )
+
+  // Get weeks ipc
+  ipcMain.handle('createWeek', async (_, ...args: Parameters<CreateWeek>) => createWeek(...args))
+
+  // Get weeks ipc
+  ipcMain.handle('updateWeek', async (_, ...args: Parameters<UpdateWeek>) => updateWeek(...args))
+
+  // Get weeks ipc
+  ipcMain.handle('deleteWeek', async (_, ...args: Parameters<DeleteWeek>) => deleteWeek(...args))
+
+  // Get Week Records IPC
+  ipcMain.handle('getWeekRecords', async (_, ...args: Parameters<GetWeekRecords>) =>
+    getWeekRecords(...args)
+  )
+
+  // Update Week Record IPC
+  ipcMain.handle('updateWeekRecord', async (_, ...args: Parameters<UpdateWeekRecord>) =>
+    updateWeekRecord(...args)
+  )
+
+  ipcMain.handle(
+    'updateWeekRecordPayment',
+    async (_, ...args: Parameters<UpdateWeekRecordPayment>) => updateWeekRecordPayment(...args)
+  )
+
+  // Delete Week Record IPC
+  ipcMain.handle('deleteWeekRecord', async (_, ...args: Parameters<DeleteWeekRecord>) =>
+    deleteWeekRecord(...args)
+  )
+
+  // Create Week Record IPC
+  ipcMain.handle('createWeekRecord', async (_, ...args: Parameters<CreateWeekRecord>) =>
+    createWeekRecord(...args)
+  )
+
+  // Get year Summary worker IPC
+  ipcMain.handle('getYearSummary', async (_, ...args: Parameters<GetYearSummary>) =>
+    getYearSummary(...args)
+  )
+
+  // Get Years By Cursor IPC
+  ipcMain.handle('getYearsByCursor', async (_, ...args: Parameters<GetYearByCursor>) =>
+    getYearsByCursor(...args)
+  )
+
+  // get summary
+  ipcMain.handle('getSummaryWorkers', async (_, ...args: Parameters<GetSummaryWorkers>) =>
+    getSummaryWorkers(...args)
+  )
+
+  ipcMain.handle('getWorkerRecords', async (_, ...args: Parameters<GetWorkerRecords>) =>
+    getWorkerRecords(...args)
+  )
+
+  ipcMain.handle('getSummaryWorker', async (_, ...args: Parameters<GetSummaryWorker>) =>
+    getSummaryWorker(...args)
   )
 
   createWindow()

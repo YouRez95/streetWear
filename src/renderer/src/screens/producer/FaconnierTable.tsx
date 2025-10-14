@@ -169,11 +169,15 @@ export default function FaconnierTable({
                       <span className="text-foreground bg-destructive rounded-full px-2 py-1 font-bold">
                         En cours
                       </span>
-                    ) : (
+                    ) : order.order_status === 'COMPLETED' ? (
                       <span className="text-foreground bg-success rounded-full px-3 py-1.5 font-bold">
                         Terminé
                       </span>
-                    )}
+                    ) : order.order_status === 'CANCELED' ? (
+                      <span className="text-foreground bg-secondary/65 rounded-full px-3 py-1.5 font-bold">
+                        Annulé
+                      </span>
+                    ) : null}
                   </TableCell>
                   <TableCell className="text-right pr-5 space-x-3">
                     {/* Download order */}

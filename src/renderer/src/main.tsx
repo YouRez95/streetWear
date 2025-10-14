@@ -11,15 +11,17 @@ import { createRoot } from 'react-dom/client'
 import { createHashRouter, RouterProvider } from 'react-router-dom'
 import App from './App'
 import './assets/main.css'
+import { ErrorPage } from './screens/errors'
 import StockReturn from './screens/stockReturn'
 import Stylists from './screens/stylist'
+import Workers from './screens/workers'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      refetchOnWindowFocus: false,
-      staleTime: 60 * 1000, // 1 minute as default stale time
+      refetchOnWindowFocus: true,
+      staleTime: 0, // 1 minute as default stale time
       gcTime: 5 * 60 * 1000 // 5 minutes as default cache time
     }
   }
@@ -59,10 +61,15 @@ const router = createHashRouter([
           {
             path: '/stock-return',
             element: <StockReturn />
+          },
+          {
+            path: '/workers',
+            element: <Workers />
           }
         ]
       }
-    ]
+    ],
+    errorElement: <ErrorPage />
   }
 ])
 

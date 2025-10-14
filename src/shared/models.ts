@@ -503,7 +503,7 @@ type GetAllProductsStatusResponse = {
 type OrderProduct = {
   type: 'PRODUCT'
   id: string
-  order_status: 'IN_PROGRESS' | 'COMPLETED'
+  order_status: 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED'
   productId: string
   reference: string
   productName: string
@@ -673,6 +673,7 @@ type GetClientSummaryResponse = {
     totalQuantityReturned: number
     totalValueSent: number
     totalAdvances: number
+    remise: number
   }
 }
 
@@ -797,6 +798,14 @@ type ToggleBonStylistResponse = {
   bon?: BonStylistData
 }
 
+type ToggleBonClientInput = {
+  bonId: string
+  seasonId: string
+  openBon: boolean
+  closeBon: boolean
+  remise?: number
+}
+
 type ToggleBonClientResponse = {
   status: 'success' | 'failed'
   message: string
@@ -844,21 +853,27 @@ type GetSummaryResponse = {
       openBons: number
       closedBons: number
       totalAmount: number
-      totalAdvances: any
+      totalAmountAfterRemise: number
+      totalAdvances: number
+      totalRemise: number
       remainingAmount: number
     }
     client: {
       openBons: number
       closedBons: number
       totalAmount: number
-      totalAdvances: any
+      totalAmountAfterRemise: number
+      totalAdvances: number
+      totalRemise: number
       remainingAmount: number
     }
     stylist: {
       openBons: number
       closedBons: number
       totalAmount: number
-      totalAdvances: any
+      totalAmountAfterRemise: number
+      totalAdvances: number
+      totalRemise: number
       remainingAmount: number
     }
     totalSales: number
@@ -880,4 +895,272 @@ type GetRetardOrdersFaconnierResponse = {
     delayDays: number
     productImage: string | null
   }[]
+}
+
+// Worker models
+type WorkPlace = {
+  id: string
+  name: string
+  address: string | null
+  createdAt: string
+}
+
+type CreateWorkPlaceInput = {
+  id: string
+  name: string
+  address: string | null
+}
+
+type CreateWorkPlaceResponse = {
+  status: 'success' | 'failed'
+  message: string
+  workplace?: {
+    id: string
+    name: string
+    address: string | null
+    createdAt: string
+    updatedAt: string
+  }
+}
+
+type WorkerData = {
+  id: string
+  name: string
+  phone: string | null
+  workplaceId: string
+  salaireHebdomadaire: number
+  isActive: boolean
+  createdAt: string
+}
+
+type GetWorkersResponse = {
+  id: string
+  name: string
+  phone: string | null
+  salaireHebdomadaire: number
+  createdAt: string
+  isActive: boolean
+  workplace: {
+    id: string
+    name: string
+  }
+}
+
+type CreateWorkerInput = Omit<WorkerData, 'id' | 'isActive' | 'createdAt'>
+
+type UpdateWorkerInput = Omit<WorkerData, 'isActive' | 'createdAt'>
+
+type CreateWorkerResponse = {
+  status: 'success' | 'failed'
+  message: string
+  worker?: WorkerData
+}
+
+type Week = {
+  id: string
+  weekStart: string
+  weekEnd: string
+  weekNumber: number
+  displayText: string
+}
+
+type CreateWeekResponse = {
+  status: 'success' | 'failed'
+  message: string
+  week?: {
+    weekStart: Date
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    weekEnd: Date
+  }
+}
+
+type DeleteWeekResponse = {
+  status: 'success' | 'failed'
+  message: string
+  week?: {
+    weekStart: Date
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    weekEnd: Date
+  }
+  nextWeekId?: string | null
+}
+
+type WorkerRecord = {
+  id: string
+  workerId: string
+  weekId: string
+  lundi: number
+  lundiSupp: number
+  mardi: number
+  mardiSupp: number
+  mercredi: number
+  mercrediSupp: number
+  jeudi: number
+  jeudiSupp: number
+  vendredi: number
+  vendrediSupp: number
+  samedi: number
+  samediSupp: number
+  description: string | null
+  salaireHebdomadaire: number
+  avance: number
+  isPaid: boolean
+  worker: {
+    id: string
+    name: string
+  }
+}
+
+type GetWeeksRecordsInput = {
+  weekId: string
+  workplaceId: string
+}
+
+type GetWeekRecordsResponse = {
+  status: 'success' | 'failed'
+  message: string
+  records: WorkerRecord[]
+  nextWeekId: string | null
+  prevWeekId: string | null
+}
+
+type UpdateWeekRecordInput = {
+  id: string
+  lundi: number
+  mardi: number
+  mercredi: number
+  jeudi: number
+  vendredi: number
+  samedi: number
+  avance: number
+}
+
+type UpdateWeekRecordPaymentInput = {
+  type: 'pay' | 'undo'
+  recordId: string
+}
+
+type UpdateWeekRecordResponse = {
+  status: 'success' | 'failed'
+  message: string
+  record?: WorkerRecord
+}
+
+type GetYearSummaryInput = {
+  year: string
+  workplaceId: string
+}
+
+type GetYearSummaryResponse = {
+  status: 'success' | 'failed'
+  message: string
+  records?: {
+    name: string
+    weeks: any[]
+    totalAmount: number
+  }[]
+  yearTotal?: number
+  nextYear?: number | null
+  prevYear?: number | null
+  year?: number
+}
+
+type GetSummaryWorkersResponse = {
+  status: 'success' | 'failed'
+  message: string
+  summary: {
+    inactiveWorkers: number
+    totalOvertimeHours: number
+    totalRegularHours: number
+    totalSpent: number
+    totalWeeks: number
+    totalWorkers: number
+  }
+}
+
+type GetSummaryWorkerResponse = {
+  status: 'success' | 'failed'
+  message: string
+  summary: {
+    totalOvertimeHours: number
+    totalRegularHours: number
+    totalSpent: number
+    totalWeeks: number
+    totalAdvances: number
+    workerName: string
+  }
+}
+
+type SecondWorkerRecord = {
+  id: string
+  workerId: string
+  weekId: string
+  workplaceId: string
+  worker: {
+    name: string
+  }
+  lundi: number
+  lundiSupp: number
+  mardi: number
+  mardiSupp: number
+  mercredi: number
+  mercrediSupp: number
+  jeudi: number
+  jeudiSupp: number
+  vendredi: number
+  vendrediSupp: number
+  samedi: number
+  samediSupp: number
+  salaireHebdomadaire: number
+  avance: number
+  description: string | null
+  week: Week
+  workplace: Workplace
+  weekNumber: number
+  displayText: string
+  isPaid: boolean
+}
+
+type Workplace = {
+  id: string
+  name: string
+  address: string
+  createdAt: string
+  updatedAt: string
+}
+
+type PaginationMeta = {
+  currentPage: number
+  totalPages: number
+  totalRecords: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+  nextPage: number | null
+  prevPage: number | null
+}
+
+type GetWorkerRecordsResponse = {
+  status: 'success' | 'error'
+  message: string
+  records: SecondWorkerRecord[]
+  pagination: PaginationMeta
+}
+
+type OrderStatus = 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED'
+type CancelOrderFaconnierResponse = {
+  status: 'success' | 'failed'
+  message: string
+  order?: {
+    id: string
+    productId: string
+    quantity_sent: number
+    quantity_returned: number
+    unit_price: number
+    faconnierOrderId: string
+    order_status: OrderStatus
+  }
 }

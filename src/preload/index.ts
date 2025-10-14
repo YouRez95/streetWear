@@ -147,7 +147,55 @@ try {
     getSummaryReturnStock: (...args: Parameters<GetSummaryReturnStock>) =>
       ipcRenderer.invoke('getSummaryReturnStock', ...args),
     createOrderClientFromReturnStock: (...args: Parameters<CreateOrderClientFromReturnStock>) =>
-      ipcRenderer.invoke('createOrderClientFromReturnStock', ...args)
+      ipcRenderer.invoke('createOrderClientFromReturnStock', ...args),
+    createWorkPlace: (...args: Parameters<CreateWorkPlace>) =>
+      ipcRenderer.invoke('createWorkPlace', ...args),
+    getWorkPlaces: (...args: Parameters<GetWorkPlaces>) =>
+      ipcRenderer.invoke('getWorkPlaces', ...args),
+    getWorkplacesByCursor: (...args: Parameters<GetWorkPlacesByCursor>) =>
+      ipcRenderer.invoke('getWorkplacesByCursor', ...args),
+    updateWorkplace: (...args: Parameters<UpdateWorkplace>) =>
+      ipcRenderer.invoke('updateWorkplace', ...args),
+    deleteWorkplace: (...args: Parameters<DeleteWorkplace>) =>
+      ipcRenderer.invoke('deleteWorkplace', ...args),
+    createWorker: (...args: Parameters<CreateWorker>) =>
+      ipcRenderer.invoke('createWorker', ...args),
+    getWorkers: (...args: Parameters<GetWorkers>) => ipcRenderer.invoke('getWorkers', ...args),
+    updateWorker: (...args: Parameters<UpdateWorker>) =>
+      ipcRenderer.invoke('updateWorker', ...args),
+    deleteWorker: (...args: Parameters<DeleteWorker>) =>
+      ipcRenderer.invoke('deleteWorker', ...args),
+    getWorkersCursor: (...args: Parameters<GetWorkersByCursor>) =>
+      ipcRenderer.invoke('getWorkersCursor', ...args),
+    updateWorkerStatus: (...args: Parameters<UpdateWorkerStatus>) =>
+      ipcRenderer.invoke('updateWorkerStatus', ...args),
+    getWeeksByCursor: (...args: Parameters<GetWeeksByCursor>) =>
+      ipcRenderer.invoke('getWeeksByCursor', ...args),
+    createWeek: (...args: Parameters<CreateWeek>) => ipcRenderer.invoke('createWeek', ...args),
+    updateWeek: (...args: Parameters<UpdateWeek>) => ipcRenderer.invoke('updateWeek', ...args),
+    deleteWeek: (...args: Parameters<DeleteWeek>) => ipcRenderer.invoke('deleteWeek', ...args),
+    getWeekRecords: (...args: Parameters<GetWeekRecords>) =>
+      ipcRenderer.invoke('getWeekRecords', ...args),
+    updateWeekRecord: (...args: Parameters<UpdateWeekRecord>) =>
+      ipcRenderer.invoke('updateWeekRecord', ...args),
+    updateWeekRecordPayment: (...args: Parameters<UpdateWeekRecordPayment>) =>
+      ipcRenderer.invoke('updateWeekRecordPayment', ...args),
+    deleteWeekRecord: (...args: Parameters<DeleteWeekRecord>) =>
+      ipcRenderer.invoke('deleteWeekRecord', ...args),
+    createWeekRecord: (...args: Parameters<CreateWeekRecord>) =>
+      ipcRenderer.invoke('createWeekRecord', ...args),
+    getYearSummary: (...args: Parameters<GetYearSummary>) =>
+      ipcRenderer.invoke('getYearSummary', ...args),
+    getYearsByCursor: (...args: Parameters<GetYearByCursor>) =>
+      ipcRenderer.invoke('getYearsByCursor', ...args),
+    getSummaryWorkers: (...args: Parameters<GetSummaryWorkers>) =>
+      ipcRenderer.invoke('getSummaryWorkers', ...args),
+    getWorkerRecords: (...args: Parameters<GetWorkerRecords>) =>
+      ipcRenderer.invoke('getWorkerRecords', ...args),
+    getSummaryWorker: (...args: Parameters<GetSummaryWorker>) =>
+      ipcRenderer.invoke('getSummaryWorker', ...args),
+    cancelOrderFaconnier: (...args: Parameters<CancelOrderFaconnier>) =>
+      ipcRenderer.invoke('cancelOrderFaconnier', ...args)
   })
 } catch (error) {
   console.error('Failed to expose context:', error)

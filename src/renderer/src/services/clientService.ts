@@ -139,9 +139,10 @@ export const clientService = {
       throw error
     }
   },
-  toggleBonClient: async (bonId: string, seasonId: string, openBon: boolean, closeBon: boolean) => {
+  toggleBonClient: async (toggleData: ToggleBonClientInput) => {
+    const { bonId, seasonId, openBon, closeBon, remise } = toggleData
     try {
-      return await window.context.toggleBonClient(bonId, seasonId, openBon, closeBon)
+      return await window.context.toggleBonClient(toggleData)
     } catch (error) {
       console.error('Error toggling bon client:', error)
       throw error

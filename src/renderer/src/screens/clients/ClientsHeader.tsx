@@ -32,6 +32,7 @@ export default function ClientsHeader() {
 
   const totalValue = dataSummary?.summary?.totalValueSent || 0
   const totalAdvances = dataSummary?.summary?.totalAdvances || 0
+  const bonRemise = dataSummary?.summary?.remise || 0
 
   const stats: Stat[] = [
     {
@@ -67,7 +68,7 @@ export default function ClientsHeader() {
     {
       key: 'totalAvancesRestantes',
       label: 'Montant restant',
-      value: totalValue - totalAdvances
+      value: totalValue - totalAdvances - bonRemise
     }
   ]
 
@@ -101,6 +102,11 @@ export default function ClientsHeader() {
                     )}
                   >
                     <span>{stat.percentage.toFixed(1)}%</span>
+                  </div>
+                )}
+                {stat.key === 'totalAvancesRestantes' && bonRemise > 0 && (
+                  <div className="flex items-center gap-1 p-1 px-3 mt-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    <span>Remise appliquée: {bonRemise} Dhs</span>
                   </div>
                 )}
               </div>
