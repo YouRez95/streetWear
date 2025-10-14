@@ -183,15 +183,6 @@ app.whenReady().then(async () => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-  // async function testServer() {
-  //   try {
-  //     const response = await fetch(SERVER_URL)
-  //     const data = await response.json()
-  //     console.log('Server response:', data)
-  //   } catch (error) {
-  //     console.log('error', error)
-  //   }
-  // }
 
   // Login User IPC
   ipcMain.handle('loginUser', (_, ...args: Parameters<LoginUser>) => loginUser(...args))
