@@ -60,7 +60,7 @@ export default function ViewProductSheet({
               <InfoLine label="Quantité totale" value={`${product.totalQty} pcs`} />
 
               {/* Poids et Métrage */}
-              {(product.poids || product.metrage) && (
+              {(product.poids > 0 || product.metrage > 0) && (
                 <div className="pt-2 mt-2 border-t border-border">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-1 h-4 bg-primary rounded-full" />
