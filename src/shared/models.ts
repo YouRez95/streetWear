@@ -135,6 +135,8 @@ type Product = {
   description?: string
   reference: string
   totalQty: number
+  poids: number
+  metrage: number
   type: 'طبعة' | 'طرزة' | 'طبعة_طرزة' | null
   productImage?: string
   createdAt: string
@@ -179,6 +181,7 @@ type GetProductsParams = {
   page: number
   limit: number
   search: string
+  date: string
   seasonId: string
 }
 

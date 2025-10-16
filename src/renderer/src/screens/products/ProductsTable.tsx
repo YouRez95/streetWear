@@ -9,11 +9,12 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import { Progress } from '@renderer/components/ui/progress'
 import { useProducts } from '@renderer/hooks/useProduct'
 import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
-import { ChevronDown, ChevronRight, Eye, Pencil, Trash2 } from 'lucide-react'
+import { ArrowUpDown, ChevronDown, ChevronRight, Eye, Pencil, Trash2 } from 'lucide-react'
 import { Fragment, ReactNode, useEffect, useState } from 'react'
 import TransferProductDropDown from './TransferProductDropDown'
 type ProductsTableProps = {
@@ -22,6 +23,8 @@ type ProductsTableProps = {
   search: string
   page: number
   setTotalPages: (totalPages: number) => void
+  date: 'asc' | 'desc'
+  setDate: (date: 'asc' | 'desc') => void
   limit: number
   // setUpdateProduct: (product: any) => void
   setOpenEditDialog: (open: boolean) => void
@@ -83,7 +86,9 @@ export default function ProductsTable({
   setSelectedTransferTo,
   setOpenTransferDialogFaconnier,
   setOpenTransferDialogClient,
-  setOpenTransferDialogStylist
+  setOpenTransferDialogStylist,
+  date,
+  setDate
 }: ProductsTableProps) {
   const [nestedTable, setNestedTable] = useState<string | null>(null)
 
@@ -92,7 +97,7 @@ export default function ProductsTable({
   }
 
   const debouncedSearchTerm = useDebounce(search, 300)
-  const { data: productsData, isLoading } = useProducts(page, limit, debouncedSearchTerm)
+  const { data: productsData, isLoading } = useProducts(page, limit, debouncedSearchTerm, date)
 
   useEffect(() => {
     if (productsData) {
@@ -113,7 +118,16 @@ export default function ProductsTable({
             <TableHead className="w-[50px]"></TableHead>
             <TableHead className="text-background w-[150px] font-semibold">Référence</TableHead>
             <TableHead className="text-background w-[300px] font-semibold">Modèle</TableHead>
-            <TableHead className="text-background w-[200px] font-semibold">Date</TableHead>
+            <TableHead className="text-background w-[200px] font-semibold">
+              Date
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setDate(date === 'asc' ? 'desc' : 'asc')}
+              >
+                <ArrowUpDown className="w-4 h-4" />
+              </Button>
+            </TableHead>
             <TableHead className="text-background w-[150px] font-semibold">Quantité</TableHead>
             <TableHead className="text-background w-[150px] font-semibold">Type</TableHead>
             <TableHead className="text-background w-[250px] font-semibold">

@@ -1,5 +1,5 @@
 export const workersService = {
-  createWorkPlace: async (workPlaceData: CreateWorkPlaceInput) => {
+  createWorkPlace: async (workPlaceData: Omit<CreateWorkPlaceInput, 'id'>) => {
     try {
       const result = await window.context.createWorkPlace(workPlaceData)
       return result

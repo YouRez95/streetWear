@@ -14,7 +14,7 @@ import { Label } from '@renderer/components/ui/label'
 import { Textarea } from '@renderer/components/ui/textarea'
 import { useCreateProduct } from '@renderer/hooks/useProduct'
 import { validateProductForm } from '@renderer/utils'
-import { Upload } from 'lucide-react'
+import { AlertTriangle, Ruler, Scale, Upload } from 'lucide-react'
 import { useState } from 'react'
 
 type CreateProductDialogProps = {
@@ -29,7 +29,9 @@ const initialFormData: CreateProductInput = {
   totalQty: 0,
   productImage: null,
   fileName: null,
-  createdAt: new Date().toISOString()
+  createdAt: new Date().toISOString(),
+  poids: 0,
+  metrage: 0
 }
 
 export default function CreateProductDialog({ open, setOpen }: CreateProductDialogProps) {
@@ -43,7 +45,8 @@ export default function CreateProductDialog({ open, setOpen }: CreateProductDial
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     if (error) setError(null)
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    const value = e.target.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value
+    setFormData({ ...formData, [e.target.name]: value })
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -205,8 +208,58 @@ export default function CreateProductDialog({ open, setOpen }: CreateProductDial
             </div>
           </div>
 
+          {/* Poids et Métrage */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2 bg-muted-foreground p-2 rounded-lg">
+              <Label htmlFor="poids" className="text-base font-semibold flex items-center gap-2">
+                <Scale className="w-4 h-4" />
+                Poids (kg)
+              </Label>
+              <Input
+                id="poids"
+                name="poids"
+                placeholder="Poids en kilogrammes"
+                type="number"
+                step="0.01"
+                min="0"
+                className="border border-background/50 text-[14px] md:text-[14px] placeholder:text-background/50"
+                value={formData.poids || ''}
+                onChange={handleChange}
+              />
+              <p className="text-xs text-background/60">
+                Optionnel - laissez vide si non applicable
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 bg-muted-foreground p-2 rounded-lg">
+              <Label htmlFor="metrage" className="text-base font-semibold flex items-center gap-2">
+                <Ruler className="w-4 h-4" />
+                Métrage (m)
+              </Label>
+              <Input
+                id="metrage"
+                name="metrage"
+                placeholder="Longueur en mètres"
+                type="number"
+                step="0.01"
+                min="0"
+                className="border border-background/50 text-[14px] md:text-[14px] placeholder:text-background/50"
+                value={formData.metrage || ''}
+                onChange={handleChange}
+              />
+              <p className="text-xs text-background/60">
+                Optionnel - laissez vide si non applicable
+              </p>
+            </div>
+          </div>
+
           <div className="text-base text-destructive">
-            {error && <p className="text-destructive">{error}</p>}
+            {error && (
+              <p className="text-destructive border w-fit border-destructive flex items-center px-2 text-base rounded">
+                <AlertTriangle className="inline w-4 h-4 mr-2" />
+                {error}
+              </p>
+            )}
           </div>
 
           {/* Actions */}

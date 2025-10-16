@@ -73,18 +73,18 @@ export const PaymentModal = ({
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Employé:</span>
+              <span className="text-sm text-background/50">Employé:</span>
               <span className="font-medium">{workerName}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Semaine:</span>
+              <span className="text-sm text-background/50">Semaine:</span>
               <span className="font-medium">{weekName}</span>
             </div>
 
             {type === 'pay' && (
               <div className="flex justify-between border-t pt-2 mt-2">
-                <span className="text-sm text-muted-foreground">Montant à payer:</span>
+                <span className="text-sm text-background/50">Montant à payer:</span>
                 <span className="font-bold text-lg text-green-600">{reste?.toFixed(0)} dh</span>
               </div>
             )}
