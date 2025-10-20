@@ -25,6 +25,7 @@ export default function Products() {
   const [openTransferDialogFaconnier, setOpenTransferDialogFaconnier] = useState(false)
   const [openTransferDialogClient, setOpenTransferDialogClient] = useState(false)
   const [openTransferDialogStylist, setOpenTransferDialogStylist] = useState(false)
+  const [date, setDate] = useState<'asc' | 'desc'>('asc')
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden gap-4">
       <ProductsHeader />
@@ -37,6 +38,8 @@ export default function Products() {
             <ProductsTable
               setOpenSheet={setOpenSheet}
               search={search}
+              date={date}
+              setDate={setDate}
               page={page}
               setTotalPages={setTotalPages}
               limit={limit}

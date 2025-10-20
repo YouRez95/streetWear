@@ -63,7 +63,8 @@ export function CreateWorkerDialog() {
     createWorkerMutation.mutate(
       {
         ...formData,
-        salaireHebdomadaire: Number(formData.salaireHebdomadaire)
+        salaireHebdomadaire: Number(formData.salaireHebdomadaire),
+        workplaceId: formData.workPlaceId
       },
       {
         onSuccess: (data) => {
@@ -153,7 +154,7 @@ export function CreateWorkerDialog() {
               </Button>
             </DialogClose>
             <Button type="submit" className="text-base" onClick={handleSubmit}>
-              Créer un worker
+              Ajouter l'employé
             </Button>
           </div>
         </DialogFooter>

@@ -1,10 +1,10 @@
 import apiClient from '@/utils/apiClient'
 import { getMimeTypeFromFileName } from '@/utils/getMimeType'
 
-export const getProducts: GetProducts = async ({ page, limit, search, seasonId }) => {
+export const getProducts: GetProducts = async ({ page, limit, search, seasonId, date }) => {
   try {
     const result = await apiClient.get(
-      `/api/v1/product/all/${seasonId}?page=${page}&limit=${limit}&search=${search}`
+      `/api/v1/product/all/${seasonId}?page=${page}&limit=${limit}&search=${search}&date=${date}`
     )
 
     return result.data
@@ -27,7 +27,16 @@ export const getProducts: GetProducts = async ({ page, limit, search, seasonId }
 export const createProduct: CreateProduct = async (product, seasonId: string) => {
   try {
     const formData = new FormData()
-    const fields = ['name', 'reference', 'type', 'totalQty', 'description', 'createdAt']
+    const fields = [
+      'name',
+      'reference',
+      'type',
+      'totalQty',
+      'description',
+      'createdAt',
+      'poids',
+      'metrage'
+    ]
 
     for (const key of fields) {
       formData.append(key, product[key] || '')
@@ -75,7 +84,16 @@ export const createProduct: CreateProduct = async (product, seasonId: string) =>
 export const updateProduct: UpdateProduct = async (product, seasonId) => {
   try {
     const formData = new FormData()
-    const fields = ['name', 'reference', 'type', 'totalQty', 'description', 'createdAt']
+    const fields = [
+      'name',
+      'reference',
+      'type',
+      'totalQty',
+      'description',
+      'createdAt',
+      'poids',
+      'metrage'
+    ]
 
     for (const key of fields) {
       formData.append(key, product[key] || '')

@@ -80,7 +80,7 @@ export default function ProductsHeader() {
               <div className="flex flex-col leading-none">
                 <p className="text-base font-medium text-background">{stat.label}</p>
                 <p className="text-lg font-semibold font-bagel leading-snug">
-                  {stat.value.toLocaleString()} produits
+                  {stat.value.toLocaleString()} {stat.key === 'total' ? 'produits' : 'pcs'}
                 </p>
                 {stat.subValue !== undefined && stat.subLabel && (
                   <p className="text-sm text-background">
