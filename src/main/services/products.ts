@@ -35,7 +35,8 @@ export const createProduct: CreateProduct = async (product, seasonId: string) =>
       'description',
       'createdAt',
       'poids',
-      'metrage'
+      'metrage',
+      'readyQty'
     ]
 
     for (const key of fields) {
@@ -92,7 +93,8 @@ export const updateProduct: UpdateProduct = async (product, seasonId) => {
       'description',
       'createdAt',
       'poids',
-      'metrage'
+      'metrage',
+      'readyQty'
     ]
 
     for (const key of fields) {

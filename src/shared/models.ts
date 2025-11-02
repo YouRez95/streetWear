@@ -236,6 +236,7 @@ type CreateProductInput = Omit<
 > & {
   productImage: ArrayBuffer | null
   fileName: string | null
+  readyQty: number
 }
 
 type CreateProductResponse = {
