@@ -95,14 +95,14 @@ export function useCreateProduct() {
   const queryClient = useQueryClient()
 
   const { activeSeason } = useUserStore()
-  if (!activeSeason) {
-    showErrorToast('Choose one of your Seasons or create one.', '')
-    return
-  }
 
   return useMutation({
-    mutationFn: ({ productData }: { productData: CreateProductInput }) =>
-      productService.createProduct(productData, activeSeason?.id || ''),
+    mutationFn: ({ productData }: { productData: CreateProductInput }) => {
+      if (!activeSeason?.id) {
+        throw new Error('Choose one of your Seasons or create one.')
+      }
+      return productService.createProduct(productData, activeSeason.id)
+    },
     onSuccess: (data) => {
       if (data.status === 'failed') {
         showErrorToast('Error creating product', data)
@@ -129,14 +129,15 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient()
 
   const { activeSeason } = useUserStore()
-  if (!activeSeason) {
-    showErrorToast('Choose one of your Seasons or create one.', '')
-    return
-  }
 
   return useMutation({
-    mutationFn: ({ productData }: { productData: UpdateProductInput }) =>
-      productService.updateProduct(productData, activeSeason.id),
+    mutationFn: ({ productData }: { productData: UpdateProductInput }) => {
+      if (!activeSeason?.id) {
+        throw new Error('Choose one of your Seasons or create one.')
+      }
+      return productService.updateProduct(productData, activeSeason.id)
+    },
+
     onSuccess: (data) => {
       if (data.status === 'failed') {
         showErrorToast('Error updating product', data)
