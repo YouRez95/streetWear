@@ -21,6 +21,16 @@ export const returnStockService = {
     }
   },
 
+  deleteReturnStock: async (seasonId: string, stockReturnId: string) => {
+    try {
+      const result = await window.context.deleteReturnStock(seasonId, stockReturnId)
+      return result
+    } catch (error) {
+      console.error('Error deleting client return stock:', error)
+      throw error
+    }
+  },
+
   updateClientReturnStock: async (updateOrderClientData: UpdateClientReturnStockInput) => {
     try {
       const result = await window.context.updateClientReturnStock(updateOrderClientData)

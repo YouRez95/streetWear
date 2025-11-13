@@ -72,8 +72,6 @@ export function UpdateWorkerDialog({ worker, open, closeDialog }: UpdateWorkerDi
       return
     }
 
-    console.log('Form Data to submit:', formData)
-
     const workerData = {
       ...formData,
       salaireHebdomadaire: Number(formData.salaireHebdomadaire)

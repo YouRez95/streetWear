@@ -2,6 +2,7 @@ import { DialogClose } from '@radix-ui/react-dialog'
 import productLogo from '@renderer/assets/icons/products-icon.svg'
 import DatePicker from '@renderer/components/datePicker'
 import { Button } from '@renderer/components/ui/button'
+import { Checkbox } from '@renderer/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,7 @@ import { Package, PackageCheck, Ruler, Scale, Upload } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 type UpdateProductDialogProps = {
-  product: Product
+  product: Product | null
   open: boolean
   setOpen: (open: boolean) => void
 }
@@ -35,7 +36,7 @@ const initialFormData: CreateProductInput & {
   fileName: null,
   createdAt: new Date().toISOString(),
   poids: 0,
-  readyQty: 0,
+  isReady: false,
   metrage: 0
 }
 
@@ -60,7 +61,11 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
         createdAt: product.createdAt || new Date().toISOString(),
         poids: product.poids || 0,
         metrage: product.metrage || 0,
-        readyQty: product.ProductStatus.quantity_ready || 0
+        isReady:
+          product.ProductStatus.quantity_ready +
+            product.ProductStatus.quantity_with_client +
+            product.ProductStatus.quantity_returned_client ===
+          product.totalQty
       })
 
       if (product.productImage) {
@@ -79,9 +84,13 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
     setFormData({ ...formData, [name]: parsedValue })
   }
 
+  const handleCheckboxChange = (checked: boolean) => {
+    if (error) setError(null)
+    setFormData({ ...formData, isReady: checked })
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('formdata', formData, formData.readyQty > formData.totalQty)
     const errorMessage = validateProductForm(formData)
     if (errorMessage) {
       setError(errorMessage)
@@ -120,10 +129,9 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
     }
   }
 
-  // Calculate percentage of ready quantity
-  const readyPercentage =
-    formData.totalQty > 0 ? Math.round((formData.readyQty / formData.totalQty) * 100) : 0
-
+  if (!product) {
+    return null
+  }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="bg-foreground min-w-[700px]">
@@ -230,10 +238,11 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
           </div>
 
           {/* Product Stock & Type */}
-          <div className="bg-muted-foreground p-3 rounded-lg">
-            <h1 className="text-base font-semibold">Gestion des stocks</h1>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-2">
+          {/* Stock Section with Ready Status */}
+          <div className="bg-muted-foreground p-4 rounded-lg shadow-sm">
+            <h1 className="text-base font-semibold mb-3">Gestion des stocks</h1>
+            <div className="flex gap-4 items-start">
+              <div className="flex-1 flex flex-col gap-2">
                 <Label htmlFor="totalQty" className="text-base font-medium flex items-center gap-2">
                   <Package className="w-4 h-4" />
                   Quantité totale
@@ -251,44 +260,29 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
                 <p className="text-xs text-background/60">Quantité totale du produit</p>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="readyQty" className="text-base font-medium flex items-center gap-2">
-                  <PackageCheck className="w-4 h-4" />
-                  Quantité prête
-                </Label>
-                <Input
-                  id="readyQty"
-                  name="readyQty"
-                  placeholder="Quantité disponible"
-                  type="number"
-                  min="0"
-                  max={formData.totalQty}
-                  className="border border-background/50 text-[14px] md:text-[14px] placeholder:text-background/50"
-                  value={formData.readyQty}
-                  onChange={handleChange}
-                />
-                <p className="text-xs text-background/60">Quantité actuellement disponible</p>
+              <div className="flex-1 flex flex-col gap-3 pt-1">
+                <div className="flex items-center gap-3 p-3 bg-background/10 rounded-lg border border-background/20">
+                  <Checkbox
+                    id="isReady"
+                    checked={formData.isReady}
+                    onCheckedChange={handleCheckboxChange}
+                    className="w-5 h-5 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                  />
+                  <div className="flex-1">
+                    <Label
+                      htmlFor="isReady"
+                      className="text-base font-medium flex items-center gap-2 cursor-pointer"
+                    >
+                      <PackageCheck className="w-4 h-4" />
+                      Stock prêt
+                    </Label>
+                    <p className="text-xs text-background/60 mt-1">
+                      Cochez si la totalité du stock est disponible
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Progress indicator */}
-            {formData.totalQty > 0 && (
-              <div className="mt-3 pt-3 border-t border-background/20">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-background/80">Progression</span>
-                  <span className="text-sm font-semibold">{readyPercentage}%</span>
-                </div>
-                <div className="w-full bg-background/20 rounded-full h-2 overflow-hidden">
-                  <div
-                    className="bg-green-500 h-full transition-all duration-300 rounded-full"
-                    style={{ width: `${Math.min(readyPercentage, 100)}%` }}
-                  />
-                </div>
-                <p className="text-xs text-background/60 mt-1">
-                  {formData.readyQty} / {formData.totalQty} unités prêtes
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Poids et Métrage */}

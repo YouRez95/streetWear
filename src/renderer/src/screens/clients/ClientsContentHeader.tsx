@@ -19,8 +19,9 @@ import { useCreateAvanceClient } from '@renderer/hooks/useClients'
 import { downloadExcelBon } from '@renderer/services/bonsService'
 import { useUserStore } from '@renderer/store'
 import { Download, FunnelPlus, HandCoins, Lock, SearchIcon, Trash, Unlock } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AddAvanceDialog from '../producer/AddAvanceDialog'
+import { SearchableSelect, SelectOption } from '../stylist/SearchableSelect'
 import { CloseBonDialog } from './CloseBonDialog'
 import { DeleteBonDialog } from './DeleteBonDialog'
 import { OpenBonDialog } from './OpenBonDialog'
@@ -92,11 +93,19 @@ export default function ClientsContentHeader({
     setOpenAvanceDialog(true)
   }
 
+  // Convert stylists to SelectOption format
+  const clientOptions: SelectOption[] = useMemo(() => {
+    return (activeClients?.clients ?? []).map((client) => ({
+      id: client.id,
+      name: client.name
+    }))
+  }, [activeClients])
+
   return (
     <div className="flex justify-between items-center mb-10 w-full">
       <div className="flex gap-4 items-center">
         {/* Client Dropdown */}
-        <Select value={selectedClientId} onValueChange={(val) => setSelectedClientId(val)}>
+        {/* <Select value={selectedClientId} onValueChange={(val) => setSelectedClientId(val)}>
           <SelectTrigger className="w-[200px] border-background/50 border rounded-md p-3 data-[placeholder]:text-background">
             <SelectValue placeholder="Select Client" />
           </SelectTrigger>
@@ -107,7 +116,16 @@ export default function ClientsContentHeader({
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+        </Select> */}
+        <SearchableSelect
+          value={selectedClientId}
+          onValueChange={setSelectedClientId}
+          options={clientOptions}
+          placeholder="Select Client"
+          searchPlaceholder="Search client..."
+          showType={false}
+          className="w-[200px]"
+        />
 
         {/* Bons Dropdown */}
         <Select
@@ -181,7 +199,7 @@ export default function ClientsContentHeader({
           </Button>
         )}
         {/* Add Avance */}
-        {selectedClient && selectedBon && (
+        {selectedClient && selectedBon && selectedClientId !== 'passager' && (
           <Button
             onClick={handleOpenAvanceDialog}
             className="bg-primary text-foreground hover:bg-primary/90 font-semibold flex items-center gap-2"
@@ -214,7 +232,7 @@ export default function ClientsContentHeader({
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <Label htmlFor="open" className="text-sm font-medium">
-                  Open
+                  Ouverts
                 </Label>
                 <Switch
                   className=""
@@ -228,7 +246,7 @@ export default function ClientsContentHeader({
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="closed" className="text-sm font-medium">
-                  Closed
+                  Fermés
                 </Label>
                 <Switch
                   id="closed"

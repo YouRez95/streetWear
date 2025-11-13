@@ -67,7 +67,7 @@ export function CreateClientDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[750px] bg-foreground text-base">
         <DialogHeader>
-          <DialogTitle>Create New Clients</DialogTitle>
+          <DialogTitle>Créer un nouveau client</DialogTitle>
           <DialogDescription className="text-background/80">
             Créer un nouveau client en remplissant les informations ci-dessous.
           </DialogDescription>

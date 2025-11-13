@@ -114,10 +114,6 @@ export function validateProductForm(formData: CreateProductInput): string | null
     return 'La quantité totale est requise.'
   }
 
-  if (formData.readyQty > formData.totalQty) {
-    return 'La quantité prête ne peut pas dépasser la quantité totale'
-  }
-
   if (!formData.createdAt) {
     return 'La date est requise.'
   }
@@ -151,7 +147,11 @@ export const cleanText = (text: string) =>
     .slice(0, 40) // optional: limit length
 
 export const generateFileName = (
-  order: (OrderProduct | OrderAvance) & { bon_number: number; faconnier?: string; stylist?: string }
+  order: (OrderProductClientRes | OrderAvanceRes) & {
+    bon_number: number
+    faconnier?: string
+    stylist?: string
+  }
 ) => {
   const date = formatDateToDDMMYYYY(order.createdAt).replaceAll('/', '-')
   //console.log('date', date)

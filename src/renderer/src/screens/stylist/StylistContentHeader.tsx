@@ -1,5 +1,3 @@
-'use client'
-
 import { Label } from '@renderer/components/ui/label'
 import {
   Select,
@@ -19,11 +17,12 @@ import { useCreateAvanceStylist } from '@renderer/hooks/useStylist'
 import { downloadExcelBon } from '@renderer/services/bonsService'
 import { useUserStore } from '@renderer/store'
 import { Download, FunnelPlus, HandCoins, Lock, SearchIcon, Trash, Unlock } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AddAvanceDialog from '../producer/AddAvanceDialog'
 import { CloseBonStylistDialog } from './CloseBonStylistDialog'
 import { DeleteBonStylistDialog } from './DeleteBonStylistDialog'
 import { OpenBonStylistDialog } from './OpenBonStylistDialog'
+import { SearchableSelect, SelectOption } from './SearchableSelect'
 
 interface StylistContentHeaderProps {
   openBon: boolean
@@ -88,22 +87,28 @@ export default function StylistContentHeader({
     setOpenAvanceDialog(true)
   }
 
+  // Convert stylists to SelectOption format
+  const stylistOptions: SelectOption[] = useMemo(() => {
+    return (activeStylists?.stylists ?? []).map((stylist) => ({
+      id: stylist.id,
+      name: stylist.name,
+      type: stylist.type
+    }))
+  }, [activeStylists])
+
   return (
     <div className="flex justify-between items-center mb-10 w-full">
       <div className="flex gap-4 items-center">
         {/* Stylist Dropdown */}
-        <Select value={selectedStylistId} onValueChange={(val) => setSelectedStylistId(val)}>
-          <SelectTrigger className="w-[200px] border-background/50 border rounded-md p-3 data-[placeholder]:text-background">
-            <SelectValue placeholder="Select Stylist" />
-          </SelectTrigger>
-          <SelectContent className="">
-            {(activeStylists?.stylists ?? []).map((stylist) => (
-              <SelectItem key={stylist.id} value={stylist.id}>
-                {stylist.name} ({stylist.type})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          value={selectedStylistId}
+          onValueChange={setSelectedStylistId}
+          options={stylistOptions}
+          placeholder="Select Stylist"
+          searchPlaceholder="Search stylist..."
+          showType={true}
+          className="w-[200px]"
+        />
 
         {/* Bons Dropdown */}
         <Select
@@ -209,7 +214,7 @@ export default function StylistContentHeader({
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <Label htmlFor="open" className="text-sm font-medium">
-                  Open
+                  Ouverts
                 </Label>
                 <Switch
                   className=""
@@ -223,7 +228,7 @@ export default function StylistContentHeader({
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="closed" className="text-sm font-medium">
-                  Closed
+                  Fermés
                 </Label>
                 <Switch
                   id="closed"

@@ -1,5 +1,5 @@
 import { PaginationComponent } from '@renderer/components/pagination'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { DeleteProductDialog } from './DeleteProductDialog'
 import ProductSearch from './ProductSearch'
 import ProductsHeader from './ProductsHeader'
@@ -17,7 +17,7 @@ export default function Products() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
-  const [limit, setLimit] = useState(20)
+  const [limit, setLimit] = useState(200)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [selectedTransferTo, setSelectedTransferTo] = useState<
     'faconnier' | 'client' | 'stylist' | null
@@ -26,6 +26,30 @@ export default function Products() {
   const [openTransferDialogClient, setOpenTransferDialogClient] = useState(false)
   const [openTransferDialogStylist, setOpenTransferDialogStylist] = useState(false)
   const [date, setDate] = useState<'asc' | 'desc'>('asc')
+
+  const handleSetOpenSheet = useCallback((open: boolean) => setOpenSheet(open), [])
+  const handleSetOpenEditDialog = useCallback((open: boolean) => setOpenEditDialog(open), [])
+  const handleSetOpenDeleteDialog = useCallback((open: boolean) => setOpenDeleteDialog(open), [])
+  const handleSetSelectedProduct = useCallback(
+    (product: Product | null) => setSelectedProduct(product),
+    []
+  )
+  const handleSetSelectedTransferTo = useCallback(
+    (transferTo: 'faconnier' | 'client' | 'stylist' | null) => setSelectedTransferTo(transferTo),
+    []
+  )
+  const handleSetOpenTransferDialogFaconnier = useCallback(
+    (open: boolean) => setOpenTransferDialogFaconnier(open),
+    []
+  )
+  const handleSetOpenTransferDialogClient = useCallback(
+    (open: boolean) => setOpenTransferDialogClient(open),
+    []
+  )
+  const handleSetOpenTransferDialogStylist = useCallback(
+    (open: boolean) => setOpenTransferDialogStylist(open),
+    []
+  )
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden gap-4">
       <ProductsHeader />
@@ -36,43 +60,40 @@ export default function Products() {
           <div className="min-h-full p-4">
             <ProductSearch setSearch={setSearch} search={search} />
             <ProductsTable
-              setOpenSheet={setOpenSheet}
+              setOpenSheet={handleSetOpenSheet}
               search={search}
               date={date}
               setDate={setDate}
               page={page}
               setTotalPages={setTotalPages}
               limit={limit}
-              setOpenEditDialog={setOpenEditDialog}
-              setOpenDeleteDialog={setOpenDeleteDialog}
-              setSelectedProduct={setSelectedProduct}
-              setSelectedTransferTo={setSelectedTransferTo}
-              setOpenTransferDialogFaconnier={setOpenTransferDialogFaconnier}
-              setOpenTransferDialogClient={setOpenTransferDialogClient}
-              setOpenTransferDialogStylist={setOpenTransferDialogStylist}
+              setOpenEditDialog={handleSetOpenEditDialog}
+              setOpenDeleteDialog={handleSetOpenDeleteDialog}
+              setSelectedProduct={handleSetSelectedProduct}
+              setSelectedTransferTo={handleSetSelectedTransferTo}
+              setOpenTransferDialogFaconnier={handleSetOpenTransferDialogFaconnier}
+              setOpenTransferDialogClient={handleSetOpenTransferDialogClient}
+              setOpenTransferDialogStylist={handleSetOpenTransferDialogStylist}
             />
-            {selectedProduct && (
-              <ViewProductSheet
-                product={selectedProduct}
-                openSheet={openSheet}
-                setOpenSheet={setOpenSheet}
-              />
-            )}
-            {selectedProduct && (
-              <UpdateProductDialog
-                product={selectedProduct}
-                open={openEditDialog}
-                setOpen={setOpenEditDialog}
-              />
-            )}
+            {/* {selectedProduct && ( */}
+            <ViewProductSheet
+              product={selectedProduct}
+              openSheet={openSheet}
+              setOpenSheet={setOpenSheet}
+            />
+            {/* )} */}
 
-            {selectedProduct && (
-              <DeleteProductDialog
-                product={selectedProduct}
-                open={openDeleteDialog}
-                setOpen={setOpenDeleteDialog}
-              />
-            )}
+            <UpdateProductDialog
+              product={selectedProduct}
+              open={openEditDialog}
+              setOpen={setOpenEditDialog}
+            />
+
+            <DeleteProductDialog
+              product={selectedProduct}
+              open={openDeleteDialog}
+              setOpen={setOpenDeleteDialog}
+            />
 
             {selectedProduct && selectedTransferTo === 'faconnier' && (
               <TransferProductFaconnierDialog

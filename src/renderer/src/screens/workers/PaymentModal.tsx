@@ -33,23 +33,12 @@ export const PaymentModal = ({
 
   const handlePayment = () => {
     // Logic to handle payment or undo payment
-    console.log(`${type === 'pay' ? 'Paying' : 'Undoing payment for'} record ID: ${recordId}`)
     if (recordId) {
       const recordData = {
         recordId,
         type
       }
-      updateWeekrecordMutation(
-        { recordData, weekId, workplaceId },
-        {
-          onSuccess: () => {
-            console.log('Payment status updated successfully')
-          },
-          onError: (error) => {
-            console.error('Error updating payment status:', error)
-          }
-        }
-      )
+      updateWeekrecordMutation({ recordData, weekId, workplaceId })
     }
   }
 

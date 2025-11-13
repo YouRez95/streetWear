@@ -9,6 +9,28 @@ export const productService = {
       throw error
     }
   },
+
+  getInfiniteProducts: async ({
+    page,
+    date,
+    limit,
+    search,
+    seasonId
+  }: GetInfinitProductsParams) => {
+    try {
+      const response = await window.context.getInfiniteProducts({
+        page,
+        limit,
+        search,
+        date,
+        seasonId
+      })
+      return response
+    } catch (error) {
+      console.error('Error fetching infinite products:', error)
+      throw error
+    }
+  },
   createProduct: async (productData: CreateProductInput, seasonId: string) => {
     try {
       const result = await window.context.createProduct(productData, seasonId)

@@ -17,10 +17,10 @@ import {
   useCreateBonStylist,
   useCreateOrderStylist
 } from '@renderer/hooks/useStylist'
-import { cn } from '@renderer/lib/utils'
 import { useUserStore } from '@renderer/store'
-import { ChevronDown, PlusIcon } from 'lucide-react'
+import { AlertCircle, Calculator, Calendar, PlusIcon, Scissors, Tag } from 'lucide-react'
 import { useState } from 'react'
+import SearchableDropdown from './SearchableDropDown'
 
 type TransferProductStylistDialogProps = {
   product: Product
@@ -39,7 +39,7 @@ type FormData = {
   date: string
 }
 
-export default function TransferProductFaconnierDialog({
+export default function TransferProductStylistDialog({
   product,
   open,
   setOpen
@@ -50,13 +50,11 @@ export default function TransferProductFaconnierDialog({
   const [selectStylist, setSelectStylist] = useState<SelectedStylist>()
   const [selectBonNumber, setSelectBonNumber] = useState<number | null>(null)
   const { data: activeStylists } = useActiveStylists()
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [isBonNumberOpen, setIsBonNumberOpen] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     stylistId: null,
     transferQuantity: product.ProductStatus.raw_in_stock,
     priceByUnit: 0,
-    bon_number: selectBonNumber,
+    bon_number: null,
     date: new Date().toISOString()
   })
   const { mutate: createOrderStylist } = useCreateOrderStylist()
@@ -81,7 +79,6 @@ export default function TransferProductFaconnierDialog({
   }
 
   const handleTransfer = () => {
-    // Add the product id to the form data
     if (!formData.stylistId) {
       setError('Veuillez sélectionner un stylist')
       return
@@ -100,12 +97,10 @@ export default function TransferProductFaconnierDialog({
     }
 
     if (!formData.bon_number) {
-      setError('Please select a bon number')
+      setError('Veuillez sélectionner un numéro de bon')
       return
     }
     setError(null)
-
-    //console.log('form data to stylist', formData)
 
     createOrderStylist(
       {
@@ -127,13 +122,11 @@ export default function TransferProductFaconnierDialog({
     )
   }
 
-  // Add Bon Number
   const handleAddBonNumber = () => {
     if (activeSeason && selectStylist?.id) {
       createBonStylist(selectStylist.id, {
         onSuccess: (data) => {
           if (data.status === 'failed') {
-            //console.log('data on create bon', data)
             return
           }
           setSelectStylist((prevStylist) => {
@@ -160,196 +153,216 @@ export default function TransferProductFaconnierDialog({
     }
   }
 
+  const totalPrice = formData.transferQuantity * formData.priceByUnit
+  const availableQuantity = product.ProductStatus.raw_in_stock
+
   return (
     <Dialog open={open} onOpenChange={closeDialog}>
       <DialogContent
-        className="bg-foreground min-w-[700px]"
+        className="min-w-[700px] max-w-2xl bg-white shadow-xl"
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <DialogHeader className="flex flex-col gap-2">
-          <DialogTitle className="flex items-center gap-2">
-            <img
-              src={productLogo}
-              alt="product-logo"
-              className="w-10 h-10 bg-background p-2 rounded-lg"
-            />
-            <p className="text-2xl font-bagel">Transférer un produit</p>
-            <Badge variant="outline" className="bg-background text-foreground mt-1">
-              {product.name}
-            </Badge>
+        <DialogHeader className="space-y-4 pb-4 border-b">
+          <DialogTitle className="flex items-center gap-3 text-2xl font-semibold text-gray-900">
+            <div className="p-2 bg-primary rounded-lg">
+              <img src={productLogo} alt="product-logo" className="w-6 h-6" />
+            </div>
+            Transférer au Stylist
           </DialogTitle>
-          <DialogDescription className="text-background/80">
-            Transférer ce produit au stylist.
+          <DialogDescription className="text-gray-600 text-base">
+            Transférer "{product.name}" à un stylist. Stock matière première disponible:{' '}
+            <span className="font-semibold text-secondary">{availableQuantity} unités</span>
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4 flex items-center gap-4">
-          {/* Select Faconnier */}
-          <div className="flex gap-2 w-1/2 items-center">
-            <Label htmlFor="stylist-select" className="text-base">
-              Stylist:
-            </Label>
-            <div className="relative w-[200px]">
-              <button
-                type="button"
-                id="stylist-select"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full border border-background/50 text-[14px] flex justify-between items-center p-2 rounded-md bg-foreground text-background"
-              >
-                {selectStylist ? (
-                  <div>
-                    {selectStylist?.name}
-                    <Badge variant="outline" className="bg-background text-foreground mt-1">
-                      {selectStylist?.type}
-                    </Badge>
-                  </div>
-                ) : (
-                  'Sélectionner un stylist'
-                )}
-                <ChevronDown />
-              </button>
-              {isDropdownOpen && (
-                <div className="absolute top-full left-0 w-full bg-foreground border border-background/50 rounded-md mt-1 z-50 max-h-[200px] overflow-y-auto">
-                  {activeStylists?.stylists.length === 0 && (
-                    <div className="p-2 text-background/70">Aucun stylist trouvé</div>
-                  )}
-                  {activeStylists?.stylists.map((stylist) => (
-                    <div
-                      key={stylist.id}
-                      className="p-2 hover:bg-background/10 cursor-pointer text-sm"
-                      onClick={() => {
-                        setSelectStylist(stylist)
-                        setIsDropdownOpen(false)
-                        const firstBonNumber = stylist.BonsStyleTrait[0]?.bon_number || null
-                        setSelectBonNumber(firstBonNumber)
-                        setFormData((prevData) => ({
-                          ...prevData,
-                          stylistId: stylist.id,
-                          bon_number: firstBonNumber
-                        }))
-                      }}
-                    >
-                      {stylist.name} ({stylist.type})
-                    </div>
-                  ))}
-                </div>
-              )}
+        {/* Product Summary */}
+        <div className="bg-background/5 rounded-lg p-4 mb-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="font-semibold text-gray-900">{product.name}</h3>
+              <p className="text-sm text-gray-600">Référence: {product.reference}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-600">Stock matière première</p>
+              <p className="text-lg font-bold text-secondary">{availableQuantity} unités</p>
             </div>
           </div>
-          {/* Transfer Quantity */}
-          <div className="flex items-center gap-2 w-1/2">
-            <Label
-              htmlFor="transfer-quantity"
-              className="text-background text-base whitespace-nowrap"
-            >
-              Quantité:
-            </Label>
-            {/* <div className="relative w-full"> */}
-            <Input
-              name="transferQuantity"
-              id="transfer-quantity"
-              className="border-background/50"
-              type="number"
-              value={formData.transferQuantity}
-              onChange={handleFormChange}
-            />
-            {/* <span className="absolute top-full left-0 text-destructive text-sm">
-                you can only transfer {product.ProductStatus.raw_in_stock} units
-              </span> */}
-            {/* </div> */}
-          </div>
         </div>
 
-        <div className="flex items-center gap-4 py-4 relative">
-          {/* Price By Unit */}
-          <div className="flex gap-2 w-1/2 items-center">
-            <Label htmlFor="price-by-unit" className="text-background text-base whitespace-nowrap">
-              Prix par unité:
-            </Label>
-            <Input
-              name="priceByUnit"
-              id="price-by-unit"
-              className="border-background/50"
-              type="number"
-              value={formData.priceByUnit}
-              onChange={handleFormChange}
-            />
-          </div>
-          {/* Total Price */}
-          <div className="flex items-center gap-2 w-1/2">
-            <Label htmlFor="total-price" className="text-background text-base whitespace-nowrap">
-              Total:
-            </Label>
-            <Input
-              name="totalPrice"
-              id="total-price"
-              className="border-background/50"
-              type="number"
-              readOnly
-              value={formData.transferQuantity * formData.priceByUnit}
-            />
-          </div>
-          <DatePicker setFormData={setFormData} />
-        </div>
-        {/* Bon Number */}
-        <div className="flex gap-2 items-center">
-          {selectStylist && (
-            <>
-              <div className="flex gap-2 relative w-full">
-                <button
-                  type="button"
-                  id="bon-number-select"
-                  onClick={() => setIsBonNumberOpen(!isBonNumberOpen)}
-                  className="w-full border border-background/50 text-[14px] flex justify-between items-center p-2 rounded-md bg-foreground text-background"
-                >
-                  {selectBonNumber ? `bon #${selectBonNumber}` : 'Sélectionner un numéro de bon'}
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform ${isBonNumberOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {isBonNumberOpen && (
-                  <div className="absolute top-full left-0 w-full bg-foreground border border-background/50 rounded-md mt-1 z-50 max-h-[200px] overflow-y-auto">
-                    {selectStylist?.BonsStyleTrait.length === 0 && (
-                      <div className="p-2 text-background/70">Aucun numéro de bon trouvé</div>
-                    )}
-                    {selectStylist?.BonsStyleTrait.map((bon) => (
-                      <div
-                        key={bon.bon_number}
-                        className="p-2 hover:bg-background/10 cursor-pointer text-sm"
-                        onClick={() => {
-                          setSelectBonNumber(bon.bon_number)
-                          setIsBonNumberOpen(false)
-                          setFormData((prevData) => ({ ...prevData, bon_number: bon.bon_number }))
-                        }}
-                      >
-                        bon #{bon.bon_number}
-                      </div>
-                    ))}
+        <div className="space-y-6">
+          {/* Stylist Selection and Date */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label
+                htmlFor="stylist-select"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
+                <Scissors className="w-4 h-4" />
+                Stylist
+              </Label>
+              <SearchableDropdown
+                items={activeStylists?.stylists || []}
+                selectedItem={selectStylist}
+                onSelect={(stylist) => {
+                  setSelectStylist(stylist)
+                  const firstBonNumber = stylist.BonsStyleTrait[0]?.bon_number || null
+                  setSelectBonNumber(firstBonNumber)
+                  setFormData((prevData) => ({
+                    ...prevData,
+                    stylistId: stylist.id,
+                    bon_number: firstBonNumber
+                  }))
+                }}
+                placeholder="Sélectionner un stylist"
+                displayValue={(stylist) => stylist.name}
+                displayLabel={(stylist) => (
+                  <div className="flex items-center gap-2">
+                    <span>{stylist.name}</span>
+                    <Badge variant="outline" className="bg-gray-100 text-gray-700">
+                      {stylist.type}
+                    </Badge>
                   </div>
                 )}
+                searchFields={['name', 'type']}
+              />
+            </div>
+
+            {/* Date Picker */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Date de transfert
+              </Label>
+              <DatePicker setFormData={setFormData} />
+            </div>
+          </div>
+
+          {/* Quantity and Pricing */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="transfer-quantity" className="text-sm font-medium text-gray-700">
+                Quantité
+              </Label>
+              <Input
+                name="transferQuantity"
+                id="transfer-quantity"
+                type="number"
+                min="1"
+                max={availableQuantity}
+                value={formData.transferQuantity}
+                onChange={handleFormChange}
+                className="w-full"
+              />
+              <p className="text-xs text-gray-500">Max: {availableQuantity} unités</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="price-by-unit"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
+                <Tag className="w-4 h-4" />
+                Prix unitaire
+              </Label>
+              <Input
+                name="priceByUnit"
+                id="price-by-unit"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.priceByUnit}
+                onChange={handleFormChange}
+                className="w-full"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="total-price"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
+                <Calculator className="w-4 h-4" />
+                Total
+              </Label>
+              <Input
+                name="totalPrice"
+                id="total-price"
+                type="number"
+                readOnly
+                value={totalPrice}
+                className="w-full bg-gray-50 font-semibold"
+              />
+              <p className="text-xs text-gray-500">Calcul automatique</p>
+            </div>
+          </div>
+
+          {/* Bon Number Section */}
+          {selectStylist && (
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-700">Numéro de bon</Label>
+              <div className="flex gap-3">
+                <SearchableDropdown
+                  items={selectStylist.BonsStyleTrait}
+                  selectedItem={selectStylist.BonsStyleTrait.find(
+                    (b) => b.bon_number === selectBonNumber
+                  )}
+                  onSelect={(bon) => {
+                    setSelectBonNumber(bon.bon_number)
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      bon_number: bon.bon_number
+                    }))
+                  }}
+                  placeholder="Sélectionner un bon"
+                  displayValue={(bon) => `Bon #${bon.bon_number}`}
+                  searchFields={['bon_number']}
+                  className="flex-1"
+                />
+                <Button onClick={handleAddBonNumber} className="shrink-0">
+                  <PlusIcon className="w-4 h-4 mr-2" />
+                  <p className="text-white font-medium">Nouveau bon</p>
+                </Button>
               </div>
-              <Button onClick={handleAddBonNumber}>
-                <PlusIcon />
-                <p>Ajouter un numéro de bon</p>
-              </Button>
-            </>
+            </div>
           )}
         </div>
 
-        <DialogFooter
-          className={cn(
-            'flex items-center gap-2 ',
-            error ? 'justify-between sm:justify-between' : 'justify-end sm:justify-end'
-          )}
-        >
-          {error && <p className="text-destructive text-sm">{error}</p>}
-          <div className="flex gap-2">
+        {/* Error Message */}
+        {error && (
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <AlertCircle className="w-4 h-4 text-red-600" />
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Actions */}
+        <DialogFooter className="flex justify-between items-center pt-6 border-t">
+          {/* <div className="text-sm text-gray-600">
+            {selectStylist && (
+              <div className="flex items-center gap-2">
+                <span>Stylist: {selectStylist.name}</span>
+                <Badge variant="outline" className="bg-gray-100 text-gray-700">
+                  {selectStylist.type}
+                </Badge>
+              </div>
+            )}
+          </div> */}
+          <div className="flex gap-3">
             <DialogClose asChild>
-              <Button variant="ghost" className="border text-base">
+              <Button variant="ghost" className="min-w-24 border">
                 Annuler
               </Button>
             </DialogClose>
-            <Button className="bg-background text-foreground text-base" onClick={handleTransfer}>
+            <Button
+              onClick={handleTransfer}
+              className="min-w-24 bg-primary"
+              disabled={
+                !formData.bon_number ||
+                formData.transferQuantity <= 0 ||
+                formData.priceByUnit <= 0 ||
+                !formData.stylistId
+              }
+            >
               Transférer
             </Button>
           </div>

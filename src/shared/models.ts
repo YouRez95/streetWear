@@ -145,7 +145,8 @@ type Product = {
     id: string
     quantity_sent: number
     quantity_returned: number
-    order_status: 'IN_PROGRESS' | 'COMPLETED'
+    order_status: 'OPEN' | 'CLOSED'
+    createdAt: string
     faconnierOrder: {
       createdAt: string
       faconnier: {
@@ -158,6 +159,24 @@ type Product = {
       }
     }
   }>
+  ClientOrdersItems: {
+    id: string
+    quantity: number
+    returned: number
+    passagerName: string | null
+    createdAt: string
+    clientOrder: {
+      createdAt: Date
+      bon_number: {
+        bon_number: number
+        bonStatus: 'OPEN' | 'CLOSED'
+      }
+      client: {
+        name: string
+        id: string
+      } | null
+    }
+  }[]
   StyleTraitOrderItems: Array<{
     id: string
     quantity_sent: number
@@ -185,12 +204,29 @@ type GetProductsParams = {
   seasonId: string
 }
 
+type GetInfinitProductsParams = {
+  page: number
+  limit: number
+  search: string
+  date: 'asc' | 'desc'
+  seasonId: string
+}
+
 type GetProductsResponse = {
   status: 'success' | 'failed'
   message: string
   products: Product[]
   currentPage: number
   totalPages: number
+}
+
+type GetInfiniteProductsResponse = {
+  status: 'success' | 'failed'
+  message: string
+  products: Product[]
+  currentPage: number
+  totalPages: number
+  hasMore: boolean
 }
 
 type ReturnStock = {
@@ -202,15 +238,17 @@ type ReturnStock = {
   stockInfo: {
     totalReturned: number
     availableForTransfer: number
+    returnStockId: string
     returns: {
       client: {
         id: string
         name: string
-      }
+      } | null
       id: string
       quantity: number
       date: string
       bonNumber: number
+      passagerName: string | null
     }[]
   }
 }
@@ -232,11 +270,17 @@ type GetReturnStockResponse = {
 
 type CreateProductInput = Omit<
   Product,
-  'id' | 'ProductStatus' | 'productImage' | 'FaconnierOrderItems' | 'type' | 'StyleTraitOrderItems'
+  | 'id'
+  | 'ProductStatus'
+  | 'productImage'
+  | 'FaconnierOrderItems'
+  | 'type'
+  | 'StyleTraitOrderItems'
+  | 'ClientOrdersItems'
 > & {
   productImage: ArrayBuffer | null
   fileName: string | null
-  readyQty: number
+  isReady: boolean
 }
 
 type CreateProductResponse = {
@@ -247,7 +291,12 @@ type CreateProductResponse = {
 
 type UpdateProductInput = Omit<
   Product,
-  'ProductStatus' | 'productImage' | 'FaconnierOrderItems' | 'type' | 'StyleTraitOrderItems'
+  | 'ProductStatus'
+  | 'productImage'
+  | 'FaconnierOrderItems'
+  | 'type'
+  | 'StyleTraitOrderItems'
+  | 'ClientOrdersItems'
 > & {
   productImage: ArrayBuffer | null
   fileName: string | null
@@ -272,6 +321,11 @@ type DeleteClientReturnStockResponse = {
     clientId: string
     bonId: string
   }
+}
+
+type DeleteReturnStockResponse = {
+  status: 'success' | 'failed'
+  message: string
 }
 
 type GetSummaryReturnStockResponse = {
@@ -387,6 +441,10 @@ type CreateBonClientInput = {
   clientId: string
 }
 
+type CreateBonClientPassagerInput = {
+  seasonId: string
+}
+
 type BonClientData = {
   id: string
   createdAt: Date
@@ -401,6 +459,16 @@ type CreateBonClientResponse = {
   status: 'success' | 'failed'
   message: string
   bon?: BonClientData
+}
+
+type GetBonClientPassagerResponse = {
+  status: 'success' | 'failed'
+  message: string
+  bons?: {
+    id: string
+    createdAt: string
+    bon_number: number
+  }[]
 }
 
 type CreateOrderStylistInput = {
@@ -455,7 +523,8 @@ type CreateOrderFaconnierResponse = {
 
 type CreateOrderClientInput = {
   seasonId: string
-  clientId: string
+  clientId: string | null
+  passagerName: string | null
   productId: string
   bon_number: number
   priceByUnit: number
@@ -523,7 +592,7 @@ type OrderAvance = {
   id: string
   amount: number
   createdAt: string
-  method: 'cash' | 'check' | 'bank'
+  method: 'cash' | 'cheque' | 'bank'
   description: string
 }
 
@@ -551,10 +620,54 @@ type OrderProductClient = Omit<
   returned: number
 }
 
+type OrderProductClientRes = {
+  type: 'PRODUCT'
+  id: string
+  createdAt: string
+  reference: string
+  productName: string
+  passagerName: string | null
+  productImage: string | null
+  quantity: number
+  returned: number
+  unit_price: number
+  avance?: number
+  // Computed fields (not from DB)
+  amount?: null
+  method?: null
+  description?: null
+}
+
+// Individual Avance Item
+type OrderAvanceRes = {
+  type: 'AVANCE'
+  id: string
+  createdAt: string
+  amount: number
+  method: 'cash' | 'cheque' | 'bank'
+  description: string | null
+  passagerName?: string | null
+  reference?: null
+  productName?: null
+  productImage?: null
+  quantity?: null
+  returned?: null
+  unit_price?: null
+}
+
+// Grouped Order by Date
+type GroupedOrderByDate = {
+  date: string // Format: YYYY-MM-DD
+  totalQuantitySent: number
+  totalQuantityReturned: number
+  totalAmount: number
+  items: (OrderProductClientRes | OrderAvanceRes)[]
+}
+
 type GetOrdersClientResponse = {
   status: string
   message: string
-  orders: (OrderProductClient | OrderAvance)[]
+  orders: GroupedOrderByDate[]
   totalPages: number
   currentPage: number
 }
@@ -627,6 +740,7 @@ type CreateAvanceClientInput = {
   method: string
   description: string
   createdAt: string
+  passagerName?: string | null
 }
 
 type AvanceClientData = {
@@ -716,6 +830,8 @@ type UpdateOrderClientInput = {
     newQuantityReturned: number
     price_by_unit: number
     date: string
+    passagerName?: string | null
+    avance?: number
   }
 }
 
@@ -1083,6 +1199,8 @@ type GetSummaryWorkersResponse = {
     totalSpent: number
     totalWeeks: number
     totalWorkers: number
+    totalAdvances: number
+    restApayer: number
   }
 }
 

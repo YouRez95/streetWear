@@ -1,4 +1,4 @@
-import { useActiveClients } from '@renderer/hooks/useClients'
+import { useActiveClientsAndPassager } from '@renderer/hooks/useClients'
 import { useUserStore } from '@renderer/store'
 import ClientsContentHeader from './ClientsContentHeader'
 import ClientsTable from './ClientsTable'
@@ -31,12 +31,13 @@ export default function ClientsContent({
   setDate
 }: ClientsContentProps) {
   const { selectedClientId, selectedClientBonId } = useUserStore()
-  const { data: activeClients } = useActiveClients(openBon, closedBon)
+  const { data: activeClients } = useActiveClientsAndPassager(openBon, closedBon)
   const selectedClient = (activeClients?.clients ?? []).find(
     (client) => client.id === selectedClientId
   )
   const bons = selectedClient?.BonsClients || []
   const selectedBon = selectedClient?.BonsClients.find((bon) => bon.id === selectedClientBonId)
+
   return (
     <div>
       <div className="flex justify-between items-center min-h-[50px]">

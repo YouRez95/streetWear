@@ -11,13 +11,14 @@ import { UpdateWorkerDialog } from './UpdateWorker'
 
 type TableWorkerProps = {
   searchTerm: string
+  active: string[]
 }
 
-export default function TableWorker({ searchTerm }: TableWorkerProps) {
+export default function TableWorker({ searchTerm, active }: TableWorkerProps) {
   const [selectedWorker, setSelectedWorker] = useState<GetWorkersResponse | null>(null)
   const [dialogType, setDialogType] = useState<'update' | 'delete' | null>(null)
   const [open, setOpen] = useState(false)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(200)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
@@ -27,7 +28,7 @@ export default function TableWorker({ searchTerm }: TableWorkerProps) {
     isError,
     error,
     isFetching
-  } = useWorkers(page, limit, debouncedSearchTerm)
+  } = useWorkers(active, page, limit, debouncedSearchTerm)
 
   useEffect(() => {
     if (workersResponse?.totalPages) {

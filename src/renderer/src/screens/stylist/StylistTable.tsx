@@ -16,7 +16,7 @@ import { useUserStore } from '@renderer/store'
 import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowUpDown, Download, Info, Pencil, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 import { DeleteAvanceStylistDialog } from './DeleteAvanceStylistDialog'
 import { DeleteOrderStylistDialog } from './DeleteOrderStylistDialog'
 import { EditOrderStylistDialog } from './EditOrderStylistDialog'
@@ -38,7 +38,167 @@ type StylistTableProps = {
   selectedBon?: GetActiveStylistsResponse['stylists'][0]['BonsStyleTrait'][0]
 }
 
-export default function StylistTable({
+// Memoized row components to prevent unnecessary re-renders
+const ProductOrderRow = memo(
+  ({
+    order,
+    selectedBon,
+    selectedStylist,
+    onEdit,
+    onDelete,
+    onDownload
+  }: {
+    order: OrderProduct
+    selectedBon?: any
+    selectedStylist?: any
+    onEdit: (order: any) => void
+    onDelete: (order: any) => void
+    onDownload: (order: any) => void
+  }) => (
+    <TableRow>
+      <TableCell>{order.reference}</TableCell>
+      <TableCell className="font-medium">
+        <div className="flex items-center gap-3">
+          <img
+            src={getImageUrl(order.productImage, 'product')}
+            alt={order.id}
+            className="w-14 h-14 rounded-lg"
+            onError={(e) => {
+              const target = e.currentTarget
+              target.src = defaultProductImage
+            }}
+          />
+          <span className="text-lg">{order.productName}</span>
+        </div>
+      </TableCell>
+      <TableCell>{formatDateToDDMMYYYY(order.createdAt)}</TableCell>
+      <TableCell>{order.quantity_sent}</TableCell>
+      <TableCell>{order.unit_price?.toFixed(2)}</TableCell>
+      <TableCell>{((order.quantity_sent || 0) * (order.unit_price || 0)).toFixed(2)}</TableCell>
+      <TableCell className="text-right pr-5 space-x-3">
+        {/* Download order */}
+        {selectedBon?.bon_number && selectedStylist?.name && (
+          <Button
+            variant="ghost"
+            className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
+            onClick={() => onDownload(order)}
+          >
+            <Download className="w-4 h-4" />
+          </Button>
+        )}
+        {/* Edit order */}
+        <Button
+          onClick={() => onEdit(order)}
+          variant="ghost"
+          className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
+        >
+          <Pencil className="w-4 h-4" />
+        </Button>
+
+        {/* Delete order */}
+        <Button
+          onClick={() => onDelete(order)}
+          variant="ghost"
+          className="p-2 border border-destructive/80 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-md"
+        >
+          <Trash className="w-4 h-4" />
+        </Button>
+      </TableCell>
+    </TableRow>
+  )
+)
+
+const AvanceOrderRow = memo(
+  ({
+    order,
+    selectedBon,
+    selectedStylist,
+    onDeleteAvance,
+    onDownload
+  }: {
+    order: OrderAvance
+    selectedBon?: any
+    selectedStylist?: any
+    onDeleteAvance: (order: any) => void
+    onDownload: (order: any) => void
+  }) => (
+    <TableRow key={order.id} className="bg-yellow-100 hover:bg-yellow-200 h-[55px]">
+      <TableCell colSpan={2} className="font-bold">
+        Avance
+      </TableCell>
+      <TableCell className="font-bold" colSpan={2}>
+        {formatDateToDDMMYYYY(order.createdAt)}
+      </TableCell>
+      <TableCell className="font-bold text-left">
+        {paymentMethodMap[order.method] || 'N/A'}
+      </TableCell>
+      <TableCell className="text-left font-bold">{order.amount?.toFixed(2)} dh</TableCell>
+      <TableCell className="text-right pr-5 font-bold flex justify-end gap-3 relative">
+        {/* Download avance */}
+        {selectedBon?.bon_number && selectedStylist?.name && (
+          <Button
+            variant="ghost"
+            className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
+            onClick={() => onDownload(order)}
+          >
+            <Download className="w-4 h-4" />
+          </Button>
+        )}
+        {order.description && (
+          <HoverCard>
+            <HoverCardTrigger className="p-2 border border-secondary/80 text-secondary cursor-pointer hover:text-secondary hover:bg-secondary/10 rounded-md">
+              <Info className="w-4 h-4" />
+            </HoverCardTrigger>
+            <HoverCardContent className="text-left mr-4 text-sm font-normal">
+              {order.description}
+            </HoverCardContent>
+          </HoverCard>
+        )}
+        <Button
+          variant="ghost"
+          className="p-2 border border-destructive/80 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-md"
+          onClick={() => onDeleteAvance(order)}
+        >
+          <Trash className="w-4 h-4" />
+        </Button>
+      </TableCell>
+    </TableRow>
+  )
+)
+
+const LoadingRow = memo(() => (
+  <TableRow>
+    <TableCell colSpan={7} className="text-center">
+      Chargement...
+    </TableCell>
+  </TableRow>
+))
+
+const EmptyRow = memo(() => (
+  <TableRow>
+    <TableCell colSpan={7} className="text-center">
+      Sélectionner un styliste et un bon pour voir votre tableau
+    </TableCell>
+  </TableRow>
+))
+
+const FailedRow = memo(({ message }: { message: string }) => (
+  <TableRow>
+    <TableCell colSpan={7} className="text-center">
+      {message}
+    </TableCell>
+  </TableRow>
+))
+
+const NoDataRow = memo(() => (
+  <TableRow>
+    <TableCell colSpan={7} className="text-center">
+      Aucun produit trouvé.
+    </TableCell>
+  </TableRow>
+))
+
+function StylistTableComponent({
   search,
   page,
   setTotalPages,
@@ -75,13 +235,100 @@ export default function StylistTable({
     date: date
   })
 
-  //console.log('data from stylist table', data)
-
   useEffect(() => {
     if (data) {
       setTotalPages(data.totalPages)
     }
-  }, [data])
+  }, [data, setTotalPages])
+
+  // Memoized event handlers
+  const handleEditOrder = useCallback((order: any) => {
+    setOpenEditDialog({
+      open: true,
+      orderId: order.id,
+      quantity_sent: order.quantity_sent,
+      price_by_unit: order.unit_price,
+      date: order.createdAt
+    })
+  }, [])
+
+  const handleDeleteOrder = useCallback((order: any) => {
+    setOpenDeleteOrderDialog({
+      open: true,
+      orderId: order.id,
+      reference: order.reference
+    })
+  }, [])
+
+  const handleDeleteAvance = useCallback((order: any) => {
+    setOpenDeleteAvanceDialog({
+      open: true,
+      avanceId: order.id,
+      amount: order.amount
+    })
+  }, [])
+
+  const handleDownload = useCallback(
+    (order: any) => {
+      if (selectedBon?.bon_number && selectedStylist?.name) {
+        downloadBon({
+          stylist: selectedStylist.name,
+          bon_number: selectedBon.bon_number,
+          ...order,
+          returned: order.quantity_returned,
+          quantity: order.quantity_sent,
+          passagerName: null
+        })
+      }
+    },
+    [selectedBon, selectedStylist]
+  )
+
+  const handleDateSort = useCallback(() => {
+    setDate(date === 'asc' ? 'desc' : 'asc')
+  }, [date, setDate])
+
+  // Render conditions
+  const renderTableContent = () => {
+    if (isLoading) {
+      return <LoadingRow />
+    }
+
+    if (selectedStylistId === '' || selectedStylistBonId === '') {
+      return <EmptyRow />
+    }
+
+    if (data?.status === 'failed') {
+      return <FailedRow message={data.message} />
+    }
+
+    if (data && data.orders.length > 0) {
+      return data.orders.map((order) =>
+        order.type === 'PRODUCT' ? (
+          <ProductOrderRow
+            key={order.id}
+            order={order}
+            selectedBon={selectedBon}
+            selectedStylist={selectedStylist}
+            onEdit={handleEditOrder}
+            onDelete={handleDeleteOrder}
+            onDownload={handleDownload}
+          />
+        ) : (
+          <AvanceOrderRow
+            key={order.id}
+            order={order}
+            selectedBon={selectedBon}
+            selectedStylist={selectedStylist}
+            onDeleteAvance={handleDeleteAvance}
+            onDownload={handleDownload}
+          />
+        )
+      )
+    }
+
+    return <NoDataRow />
+  }
 
   return (
     <>
@@ -95,11 +342,7 @@ export default function StylistTable({
             <TableHead className="text-background w-[200px] font-semibold">Modèle</TableHead>
             <TableHead className="text-background w-[150px] font-semibold">
               Date
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setDate(date === 'asc' ? 'desc' : 'asc')}
-              >
+              <Button variant="ghost" size="icon" onClick={handleDateSort}>
                 <ArrowUpDown className="w-4 h-4" />
               </Button>
             </TableHead>
@@ -113,166 +356,7 @@ export default function StylistTable({
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="text-base border">
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                Chargement...
-              </TableCell>
-            </TableRow>
-          ) : selectedStylistId === '' || selectedStylistBonId === '' ? (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                Sélectionner un styliste et un bon pour voir votre tableau
-              </TableCell>
-            </TableRow>
-          ) : data?.status === 'failed' ? (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                {data.message}
-              </TableCell>
-            </TableRow>
-          ) : data && data.orders.length > 0 ? (
-            data.orders.map((order) =>
-              order.type === 'PRODUCT' ? (
-                <TableRow key={order.id}>
-                  <TableCell>{order.reference}</TableCell>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={getImageUrl(order.productImage, 'product')}
-                        alt={order.id}
-                        className="w-14 h-14 rounded-lg"
-                        onError={(e) => {
-                          const target = e.currentTarget
-                          target.src = defaultProductImage
-                        }}
-                      />
-                      <span className="text-lg">{order.productName}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{formatDateToDDMMYYYY(order.createdAt)}</TableCell>
-                  <TableCell>{order.quantity_sent}</TableCell>
-                  <TableCell>{order.unit_price?.toFixed(2)}</TableCell>
-                  <TableCell>
-                    {((order.quantity_sent || 0) * (order.unit_price || 0)).toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-right pr-5 space-x-3">
-                    {/* Download order */}
-                    {selectedBon?.bon_number && selectedStylist?.name && (
-                      <Button
-                        variant="ghost"
-                        className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
-                        onClick={() =>
-                          downloadBon({
-                            stylist: selectedStylist?.name ?? '',
-                            bon_number: selectedBon?.bon_number,
-                            ...order
-                          })
-                        }
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    )}
-                    {/* Edit order */}
-                    <Button
-                      onClick={() =>
-                        setOpenEditDialog({
-                          open: true,
-                          orderId: order.id,
-                          quantity_sent: order.quantity_sent,
-                          price_by_unit: order.unit_price,
-                          date: order.createdAt
-                        })
-                      }
-                      variant="ghost"
-                      className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-
-                    {/* Delete order */}
-                    <Button
-                      onClick={() =>
-                        setOpenDeleteOrderDialog({
-                          open: true,
-                          orderId: order.id,
-                          reference: order.reference
-                        })
-                      }
-                      variant="ghost"
-                      className="p-2 border border-destructive/80 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-md"
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                <TableRow key={order.id} className="bg-yellow-100 hover:bg-yellow-200 h-[55px]">
-                  <TableCell colSpan={2} className="font-bold">
-                    Avance
-                  </TableCell>
-                  <TableCell className="font-bold" colSpan={2}>
-                    {formatDateToDDMMYYYY(order.createdAt)}
-                  </TableCell>
-                  <TableCell className="font-bold  text-left">
-                    {paymentMethodMap[order.method] || 'N/A'}
-                  </TableCell>
-                  <TableCell className="text-left font-bold">
-                    {order.amount?.toFixed(2)} dh
-                  </TableCell>
-                  <TableCell className="text-right pr-5 font-bold flex justify-end gap-3 relative">
-                    {/* Download avance */}
-                    {selectedBon?.bon_number && selectedStylist?.name && (
-                      <Button
-                        variant="ghost"
-                        className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
-                        onClick={() =>
-                          downloadBon({
-                            stylist: selectedStylist?.name ?? '',
-                            bon_number: selectedBon?.bon_number,
-                            ...order
-                          })
-                        }
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    )}
-                    {order.description && (
-                      <HoverCard>
-                        <HoverCardTrigger className="p-2 border border-secondary/80 text-secondary cursor-pointer hover:text-secondary hover:bg-secondary/10 rounded-md">
-                          <Info className="w-4 h-4" />
-                        </HoverCardTrigger>
-                        <HoverCardContent className="text-left mr-4 text-sm font-normal">
-                          {order.description}
-                        </HoverCardContent>
-                      </HoverCard>
-                    )}
-                    <Button
-                      variant="ghost"
-                      className="p-2 border border-destructive/80 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-md"
-                      onClick={() =>
-                        setOpenDeleteAvanceDialog({
-                          open: true,
-                          avanceId: order.id,
-                          amount: order.amount
-                        })
-                      }
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )
-            )
-          ) : (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                Aucun produit trouvé.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
+        <TableBody className="text-base border">{renderTableContent()}</TableBody>
       </Table>
 
       <EditOrderStylistDialog
@@ -298,3 +382,6 @@ export default function StylistTable({
     </>
   )
 }
+
+// Export the memoized component
+export default memo(StylistTableComponent)

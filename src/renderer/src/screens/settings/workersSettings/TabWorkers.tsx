@@ -1,7 +1,10 @@
 import { LoadingSuspense } from '@renderer/components/loading'
 import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { Switch } from '@renderer/components/ui/switch'
 import { useUserStore } from '@renderer/store'
-import { Search } from 'lucide-react'
+import { FunnelPlus, Search } from 'lucide-react'
 import { Suspense, useState } from 'react'
 import { CreateWorkerDialog } from './CreateWorkerDialog'
 import TableWorker from './TableWorkers'
@@ -10,7 +13,26 @@ import TableWorker from './TableWorkers'
 
 export default function TabWorkers() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [active, setActive] = useState<string[]>(['Actif'])
   const { userData } = useUserStore()
+
+  const handleTypeChange = (type: string, checked: boolean) => {
+    setActive((prev) => {
+      if (checked) {
+        if (!prev.includes(type)) {
+          return [...prev, type]
+        }
+        return prev
+      } else {
+        if (prev.length === 2) {
+          return prev.filter((t) => t !== type)
+        } else {
+          const otherType = type === 'Actif' ? 'Inactif' : 'Actif'
+          return [otherType]
+        }
+      }
+    })
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -34,12 +56,46 @@ export default function TabWorkers() {
 
           {/* Dialog for creating User */}
           <CreateWorkerDialog />
+
+          <Popover>
+            <PopoverTrigger>
+              <FunnelPlus className="w-8 h-8 cursor-pointer text-background/70 border border-background/50 rounded-md p-2 hover:bg-background/10 transition" />
+            </PopoverTrigger>
+            <PopoverContent className="w-[150px] p-4 mr-5">
+              <div className="text-base font-semibold mb-2">Filter Stylist</div>
+              <div className="border-b border-background/20 mb-3" />
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <Switch
+                    id="Actif"
+                    checked={active.includes('Actif')}
+                    onCheckedChange={(checked) => handleTypeChange('Actif', checked)}
+                    disabled={false}
+                  />
+                  <Label htmlFor="Actif" className="text-sm font-medium">
+                    Actif
+                  </Label>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Switch
+                    id="Inactif"
+                    checked={active.includes('Inactif')}
+                    onCheckedChange={(checked) => handleTypeChange('Inactif', checked)}
+                    disabled={false}
+                  />
+                  <Label htmlFor="Inactif" className="text-sm font-medium">
+                    Inactif
+                  </Label>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </header>
 
       <div className="flex-1 flex flex-col items-center">
         <Suspense fallback={<LoadingSuspense />}>
-          <TableWorker searchTerm={searchTerm} />
+          <TableWorker searchTerm={searchTerm} active={active} />
           {/* <div>Table come here</div> */}
         </Suspense>
       </div>

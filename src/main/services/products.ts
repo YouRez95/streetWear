@@ -24,6 +24,35 @@ export const getProducts: GetProducts = async ({ page, limit, search, seasonId, 
   }
 }
 
+export const getInfiniteProducts: GetInfiniteProducts = async ({
+  page,
+  limit,
+  search,
+  seasonId,
+  date
+}) => {
+  try {
+    const result = await apiClient.get(
+      `/api/v1/product/infinite/${seasonId}?page=${page}&limit=${limit}&search=${search}&date=${date}`
+    )
+
+    return result.data
+  } catch (error: any) {
+    const { status, data } = error.response
+    if (status === 400 && data.errors) {
+      return {
+        status: 'failed',
+        message: data.errors[0].message || 'Validation error'
+      }
+    }
+
+    return {
+      status: 'failed',
+      message: data.message || 'No response from server. Please try again later.'
+    }
+  }
+}
+
 export const createProduct: CreateProduct = async (product, seasonId: string) => {
   try {
     const formData = new FormData()
@@ -36,7 +65,7 @@ export const createProduct: CreateProduct = async (product, seasonId: string) =>
       'createdAt',
       'poids',
       'metrage',
-      'readyQty'
+      'isReady'
     ]
 
     for (const key of fields) {
@@ -94,7 +123,7 @@ export const updateProduct: UpdateProduct = async (product, seasonId) => {
       'createdAt',
       'poids',
       'metrage',
-      'readyQty'
+      'isReady'
     ]
 
     for (const key of fields) {

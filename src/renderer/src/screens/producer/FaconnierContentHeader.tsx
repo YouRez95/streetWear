@@ -19,7 +19,8 @@ import { useCreateAvanceFaconnier } from '@renderer/hooks/useFaconnier'
 import { downloadExcelBon } from '@renderer/services/bonsService'
 import { useUserStore } from '@renderer/store'
 import { Download, FunnelPlus, HandCoins, Lock, SearchIcon, Trash, Unlock } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { SearchableSelect, SelectOption } from '../stylist/SearchableSelect'
 import AddAvanceDialog from './AddAvanceDialog'
 import { CloseBonDialog } from './CloseBonDialog'
 import { DeleteBonDialog } from './DeleteBonDialog'
@@ -88,22 +89,26 @@ export default function FaconnierContentHeader({
     setOpenAvanceDialog(true)
   }
 
+  const faconnierOptions: SelectOption[] = useMemo(() => {
+    return (activeFaconniers?.faconniers ?? []).map((fac) => ({
+      id: fac.id,
+      name: fac.name
+    }))
+  }, [activeFaconniers])
+
   return (
     <div className="flex justify-between items-center mb-10 w-full">
       <div className="flex gap-4 items-center">
         {/* Faconnier Dropdown */}
-        <Select value={selectedFaconnierId} onValueChange={(val) => setSelectedFaconnierId(val)}>
-          <SelectTrigger className="w-[200px] border-background/50 border rounded-md p-3 data-[placeholder]:text-background">
-            <SelectValue placeholder="Select Faconnier" />
-          </SelectTrigger>
-          <SelectContent className="">
-            {(activeFaconniers?.faconniers ?? []).map((faconnier) => (
-              <SelectItem key={faconnier.id} value={faconnier.id}>
-                {faconnier.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          value={selectedFaconnierId}
+          onValueChange={setSelectedFaconnierId}
+          options={faconnierOptions}
+          placeholder="Select faconnier..."
+          searchPlaceholder="Search faconnier..."
+          showType={false}
+          className="w-[200px]"
+        />
 
         {/* Bons Dropdown */}
         <Select value={selectedBonId || ''} onValueChange={(val) => setSelectedBonId(val)}>
@@ -207,7 +212,7 @@ export default function FaconnierContentHeader({
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <Label htmlFor="open" className="text-sm font-medium">
-                  Actifs
+                  Ouverts
                 </Label>
                 <Switch
                   className=""

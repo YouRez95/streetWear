@@ -57,8 +57,6 @@ export function CreateWorkerDialog() {
       return
     }
 
-    console.log('Form Data to submit:', formData)
-
     // Call the API to create a new worker
     createWorkerMutation.mutate(
       {

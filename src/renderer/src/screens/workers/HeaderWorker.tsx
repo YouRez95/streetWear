@@ -27,7 +27,6 @@ export default function HeaderWorkerSummary() {
     workerName: ''
   }
 
-  console.log('Summary Data:', data)
   const totalHours = summaryData.totalRegularHours + summaryData.totalOvertimeHours
 
   return (

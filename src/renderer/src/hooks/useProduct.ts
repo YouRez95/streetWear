@@ -67,6 +67,33 @@ export function useProducts(
   return result
 }
 
+type ProductsResponse = {
+  status: string
+  message: string
+  products: Product[]
+  currentPage: number
+  totalPages: number
+  hasMore: boolean
+}
+
+// export const useInfiniteProducts = (search: string, date: 'asc' | 'desc') => {
+//   const { activeSeason } = useUserStore()
+//   const seasonId = activeSeason?.id || ''
+
+//   return useInfiniteQuery({
+//     queryKey: ['products', 'infinite', seasonId, search, date],
+//     queryFn: async ({ pageParam = 1 }) =>
+//       productService.getInfiniteProducts({ limit: 20, page: pageParam, search, date, seasonId }),
+//     getNextPageParam: (lastPage) => {
+//       return lastPage.hasMore ? lastPage.currentPage + 1 : undefined
+//     },
+//     initialPageParam: 1,
+//     enabled: !!seasonId,
+//     staleTime: 30000, // 30 seconds
+//     refetchOnWindowFocus: false
+//   })
+// }
+
 export function useGetAllProductsStatus() {
   const { activeSeason } = useUserStore()
 
@@ -162,15 +189,11 @@ export function useUpdateProduct() {
 
 export function useDeleteProduct() {
   const queryClient = useQueryClient()
-
   const { activeSeason } = useUserStore()
-  if (!activeSeason) {
-    showErrorToast('Choose one of your Seasons or create one.', '')
-    return
-  }
+  const seasonId = activeSeason?.id || ''
 
   return useMutation({
-    mutationFn: (productId: string) => productService.deleteProduct(productId, activeSeason.id),
+    mutationFn: (productId: string) => productService.deleteProduct(productId, seasonId),
     onSuccess: (data) => {
       if (data.status === 'failed') {
         showErrorToast('Error deleting product', data)

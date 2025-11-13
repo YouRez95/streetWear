@@ -156,11 +156,12 @@ export const deleteStylist: DeleteStylist = async (stylistId) => {
 export const getActiveStylists: GetActiveStylists = async (
   seasonId,
   openBon = true,
-  closedBon = false
+  closedBon = false,
+  search = ''
 ) => {
   try {
     const response = await apiClient.get(
-      `/api/v1/stylist/active/${seasonId}?openBon=${openBon}&closedBon=${closedBon}`
+      `/api/v1/stylist/active/${seasonId}?openBon=${openBon}&closedBon=${closedBon}&search=${search}`
     )
     return response.data
   } catch (error: any) {

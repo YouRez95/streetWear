@@ -7,11 +7,11 @@ import {
   SheetHeader,
   SheetTitle
 } from '@/components/ui/sheet'
-import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
+import { getImageUrl } from '@renderer/utils'
 import { Ruler, Scale } from 'lucide-react'
 
 type ViewProductSheetProps = {
-  product: Product
+  product: Product | null
   setOpenSheet: (open: boolean) => void
   openSheet: boolean
 }
@@ -21,6 +21,7 @@ export default function ViewProductSheet({
   setOpenSheet,
   openSheet
 }: ViewProductSheetProps) {
+  if (!product) return null
   return (
     <Sheet open={openSheet} onOpenChange={setOpenSheet}>
       <SheetContent className="bg-foreground border min-w-[500px] overflow-y-auto">
@@ -90,7 +91,7 @@ export default function ViewProductSheet({
           </Card>
 
           {/* Styliste History */}
-          {product.StyleTraitOrderItems.length > 0 && (
+          {/* {product.StyleTraitOrderItems.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>Historique du styliste</CardTitle>
@@ -132,7 +133,7 @@ export default function ViewProductSheet({
                 </table>
               </CardContent>
             </Card>
-          )}
+          )} */}
 
           {/* Product Status */}
           {product.ProductStatus && (
