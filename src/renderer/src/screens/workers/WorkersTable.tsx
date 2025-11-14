@@ -10,6 +10,7 @@ import {
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/components/ui/hover-card'
 import { useWeekRecords } from '@renderer/hooks/useWorkers'
 import { useWorkerStore } from '@renderer/store'
+import { formatIndex } from '@renderer/utils'
 import { Check, HandCoins, Info, Pencil, Trash, Undo2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { DeleteRecordDialog } from './DeleteRecordDialog'
@@ -88,6 +89,7 @@ export const WorkersTable = ({ setNextWeekId, setPrevWeekId }: WorkersTableProps
           {/* Table Header */}
           <TableHeader>
             <TableRow className="border border-background/35 divide-x divide-background/35">
+              <TableHead className="text-background/65 min-w-10">N</TableHead>
               <TableHead className="text-background/65 min-w-[120px]">Nom</TableHead>
               <TableHead className="text-background/65 min-w-[80px]">Salaire</TableHead>
               <TableHead className="text-background/65 min-w-[70px]">S. jour</TableHead>
@@ -129,7 +131,7 @@ export const WorkersTable = ({ setNextWeekId, setPrevWeekId }: WorkersTableProps
                 </TableCell>
               </TableRow>
             )}
-            {records.map((rec) => {
+            {records.map((rec, index) => {
               const dailyRate = rec.salaireHebdomadaire / 6
               const hourlyRate = dailyRate / 9.5
               const extraHours =
@@ -149,6 +151,7 @@ export const WorkersTable = ({ setNextWeekId, setPrevWeekId }: WorkersTableProps
                   key={rec.id}
                   className={`border border-background/35 divide-x divide-background/35 hover:bg-background/5 ${rec.isPaid ? '' : 'bg-destructive/5'}`}
                 >
+                  <TableCell className="font-medium w-10">{formatIndex(index)}</TableCell>
                   <TableCell className="font-medium">{rec.worker.name}</TableCell>
                   <TableCell className="text-right">{rec.salaireHebdomadaire} dh</TableCell>
                   <TableCell className="text-right">{dailyRate.toFixed(0)} dh</TableCell>

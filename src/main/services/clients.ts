@@ -152,6 +152,26 @@ export const getActiveClients: GetActiveClients = async (
   }
 }
 
+export const getActiveClientsAndPassager: GetActiveClients = async (
+  seasonId,
+  openBon = true,
+  closedBon = false
+) => {
+  try {
+    const result = await apiClient.get(
+      `/api/v1/client/active/passager/${seasonId}?openBon=${openBon}&closedBon=${closedBon}`
+    )
+    //console.log('Get active clients result:', result)
+    return result.data
+  } catch (error: any) {
+    console.error('Error fetching active clients:', error)
+    return {
+      status: 'failed',
+      message: 'No response from server. Please try again later.'
+    }
+  }
+}
+
 export const createBonClient: CreateBonClient = async (bonData) => {
   try {
     const { seasonId, clientId } = bonData
@@ -175,13 +195,54 @@ export const createBonClient: CreateBonClient = async (bonData) => {
   }
 }
 
+export const createBonClientPassager: CreateBonClientPassager = async (bonData) => {
+  try {
+    const { seasonId } = bonData
+    const result = await apiClient.post(`/api/v1/client/bon/create/passager/${seasonId}`)
+    return result.data
+  } catch (error: any) {
+    console.error('Error creating bon client:', error)
+    const { status, data } = error.response
+    if (status === 400 && data.errors) {
+      return {
+        status: 'failed',
+        message: data.errors[0].message || 'Validation error'
+      }
+    }
+
+    return {
+      status: 'failed',
+      message: data.message || 'No response from server. Please try again later.'
+    }
+  }
+}
+
+export const getBonsClientPassager: GetBonsClientPassager = async (seasonId) => {
+  try {
+    const result = await apiClient.get(`/api/v1/client/bon/passager/${seasonId}`)
+    return result.data
+  } catch (error: any) {
+    console.error('Error get bon client passager:', error)
+    const { status, data } = error.response
+    if (status === 400 && data.errors) {
+      return {
+        status: 'failed',
+        message: data.errors[0].message || 'Validation error'
+      }
+    }
+
+    return {
+      status: 'failed',
+      message: data.message || 'No response from server. Please try again later.'
+    }
+  }
+}
+
 export const createOrderClient: CreateOrderClient = async (orderData) => {
   try {
     const { seasonId, clientId, ...restData } = orderData
-    const result = await apiClient.post(
-      `/api/v1/client/order/create/${seasonId}/${clientId}`,
-      restData
-    )
+    const endpoint = `/api/v1/client/order/create/${seasonId}/${clientId ?? 'passager'}`
+    const result = await apiClient.post(endpoint, restData)
     //console.log('Create order client result:', result)
     return result.data
   } catch (error: any) {
@@ -397,6 +458,7 @@ export const deleteBonClient: DeleteBonClient = async (bonId, seasonId) => {
 
 export const updateOrderClient: UpdateOrderClient = async (updateOrderClientData) => {
   const { orderId, formData, seasonId } = updateOrderClientData
+  console.log('Updating order client with data:', updateOrderClientData)
   try {
     const result = await apiClient.patch(
       `/api/v1/client/orders/update/${seasonId}/${orderId}`,

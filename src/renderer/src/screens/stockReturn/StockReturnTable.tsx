@@ -10,8 +10,9 @@ import {
 import { useReturnStock } from '@renderer/hooks/useReturnStock'
 import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
-import { ChevronDown, ChevronRight, Pencil, Shirt, Trash2 } from 'lucide-react'
-import { Fragment, useEffect, useState } from 'react'
+import { ChevronDown, ChevronRight, Pencil, Shirt, Trash, Trash2 } from 'lucide-react'
+import { Fragment, memo, useEffect, useState } from 'react'
+import { DeleteReturnStock } from './DeleteReturnStock'
 import TranferReturnStockToClient from './TranferReturnStockToClient'
 
 type StockReturnTableProps = {
@@ -26,7 +27,7 @@ type StockReturnTableProps = {
   ) => void
 }
 
-export default function StockReturnTable({
+export default memo(function StockReturnTable({
   search,
   limit,
   page,
@@ -37,6 +38,7 @@ export default function StockReturnTable({
 }: StockReturnTableProps) {
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
   const [openTranferProductDialog, setOpenTranferProductDialog] = useState(false)
+  const [openDeleteReturn, setOpenDeleteReturn] = useState(false)
   const [selectedStock, setSelectedStock] = useState<GetReturnStockResponse['products'][0] | null>(
     null
   )
@@ -147,6 +149,15 @@ export default function StockReturnTable({
                           setOpenTranferProductDialog(true)
                         }}
                       />
+
+                      <Trash
+                        className="w-7 h-7 cursor-pointer text-destructive/70 border border-destructive/50 rounded-md p-1"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedStock(product)
+                          setOpenDeleteReturn(true)
+                        }}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -186,36 +197,47 @@ export default function StockReturnTable({
                                   </TableCell>
                                 </TableRow>
                               ) : (
-                                product.stockInfo?.returns.map((ret) => (
-                                  <TableRow key={`${product.id}-${ret.client.id}-${ret.date}`}>
-                                    <TableCell className="font-medium">{ret.client.name}</TableCell>
-                                    <TableCell>Bon #{ret.bonNumber}</TableCell>
-                                    <TableCell>
-                                      {formatDateToDDMMYYYY(new Date(ret.date))}
-                                    </TableCell>
-                                    <TableCell className="text-right flex justify-end gap-2 items-center">
-                                      <span className="mr-4">{ret.quantity}</span>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                      <div className="flex items-center gap-3 justify-end">
-                                        <Pencil
-                                          className="w-7 h-7 cursor-pointer text-secondary border border-secondary/90 rounded-md p-1"
-                                          onClick={() => {
-                                            setOpenEditDialog(true)
-                                            setSelectedStockReturn(ret)
-                                          }}
-                                        />
-                                        <Trash2
-                                          className="w-7 h-7 cursor-pointer text-destructive/70 border border-destructive/50 rounded-md p-1"
-                                          onClick={() => {
-                                            setOpenDeleteDialog(true)
-                                            setSelectedStockReturn(ret)
-                                          }}
-                                        />
-                                      </div>
-                                    </TableCell>
-                                  </TableRow>
-                                ))
+                                product.stockInfo?.returns.map((ret, index) => {
+                                  const client = ret.client
+                                    ? ret.client
+                                    : {
+                                        id: ret.passagerName
+                                          ? `${ret.passagerName}-${index}`
+                                          : `unknown-${index}`,
+                                        name: ret.passagerName || 'Inconnu'
+                                      }
+
+                                  return (
+                                    <TableRow key={`${product.id}-${client.id}-${ret.date}`}>
+                                      <TableCell className="font-medium">{client.name}</TableCell>
+                                      <TableCell>Bon #{ret.bonNumber}</TableCell>
+                                      <TableCell>
+                                        {formatDateToDDMMYYYY(new Date(ret.date))}
+                                      </TableCell>
+                                      <TableCell className="text-right flex justify-end gap-2 items-center">
+                                        <span className="mr-4">{ret.quantity}</span>
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        <div className="flex items-center gap-3 justify-end">
+                                          <Pencil
+                                            className="w-7 h-7 cursor-pointer text-secondary border border-secondary/90 rounded-md p-1"
+                                            onClick={() => {
+                                              setOpenEditDialog(true)
+                                              setSelectedStockReturn(ret)
+                                            }}
+                                          />
+                                          <Trash2
+                                            className="w-7 h-7 cursor-pointer text-destructive/70 border border-destructive/50 rounded-md p-1"
+                                            onClick={() => {
+                                              setOpenDeleteDialog(true)
+                                              setSelectedStockReturn(ret)
+                                            }}
+                                          />
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  )
+                                })
                               )}
                             </TableBody>
                           </Table>
@@ -237,9 +259,17 @@ export default function StockReturnTable({
           product={selectedStock}
         />
       )}
+
+      {selectedStock && openDeleteReturn && (
+        <DeleteReturnStock
+          open={openDeleteReturn}
+          setOpen={setOpenDeleteReturn}
+          returnStock={selectedStock}
+        />
+      )}
     </div>
   )
-}
+})
 
 // Dummy data remains the same as provided
 // const productsData = {

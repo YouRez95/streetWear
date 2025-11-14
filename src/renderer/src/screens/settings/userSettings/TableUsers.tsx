@@ -14,7 +14,7 @@ export default function TableUsers({ searchTerm }: TableUsersProps) {
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null)
   const [dialogType, setDialogType] = useState<'update' | 'delete' | null>(null)
   const [open, setOpen] = useState(false)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(200)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const debouncedSearchTerm = useDebounce(searchTerm, 300)

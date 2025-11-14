@@ -169,10 +169,15 @@ export const createWorker: CreateWorker = async (workerData) => {
   }
 }
 
-export const getWorkers: GetWorkers = async (page, limit, search) => {
+export const getWorkers: GetWorkers = async (active, page, limit, search) => {
+  let type = ''
+  if (active.length === 1) {
+    type = active[0]
+  }
+
   try {
     const result = await apiClient.get(
-      `/api/v1/worker/all?page=${page}&limit=${limit}&search=${search}`
+      `/api/v1/worker/all?page=${page}&limit=${limit}&search=${search}&type=${type}`
     )
     return result.data
   } catch (error: any) {

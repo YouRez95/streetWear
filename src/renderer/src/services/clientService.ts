@@ -58,6 +58,15 @@ export const clientService = {
     }
   },
 
+  getActiveClientsAndPassager: async (seasonId: string, openBon: boolean, closedBon: boolean) => {
+    try {
+      return await window.context.getActiveClientsAndPassager(seasonId, openBon, closedBon)
+    } catch (error) {
+      console.error('Error fetching active clients:', error)
+      throw error
+    }
+  },
+
   createBonClient: async (bonData: CreateBonClientInput) => {
     try {
       return await window.context.createBonClient(bonData)
@@ -66,6 +75,25 @@ export const clientService = {
       throw error
     }
   },
+
+  getBonsClientPassager: async (seasonId: string) => {
+    try {
+      return await window.context.getBonsClientPassager(seasonId)
+    } catch (error) {
+      console.error('Error get bon for client passager:', error)
+      throw error
+    }
+  },
+
+  createBonClientPassager: async (bonData: CreateBonClientPassagerInput) => {
+    try {
+      return await window.context.createBonClientPassager(bonData)
+    } catch (error) {
+      console.error('Error creating bon client:', error)
+      throw error
+    }
+  },
+
   createOrderClient: async (orderData: CreateOrderClientInput) => {
     try {
       return await window.context.createOrderClient(orderData)

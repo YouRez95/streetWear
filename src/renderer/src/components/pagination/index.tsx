@@ -33,7 +33,7 @@ export const PaginationComponent = ({
   setLimit
 }: PaginationComponentProps) => {
   const paginationPages = getPaginationPages(page, totalPages)
-  const limitItems = [10, 20, 50, 100]
+  const limitItems = [50, 100, 150, 200]
   return (
     <Pagination className="h-full relative">
       <Select

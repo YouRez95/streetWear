@@ -120,6 +120,10 @@ type ToggleSeason = (seasonId: string) => Promise<CreateSeasonResponse>
 // Products Types
 type GetProducts = (getProductData: GetProductsParams) => Promise<GetProductsResponse>
 
+type GetInfiniteProducts = (
+  getProductData: GetInfinitProductsParams
+) => Promise<GetInfiniteProductsResponse>
+
 type GetReturnStock = (getReturnStockData: GetReturnStockParams) => Promise<GetReturnStockResponse>
 
 type CreateProduct = (
@@ -138,6 +142,11 @@ type DeleteClientReturnStock = (
   clientReturnId: string,
   seasonId: string
 ) => Promise<DeleteClientReturnStockResponse>
+
+type DeleteReturnStock = (
+  seasonId: string,
+  stockReturnId: string
+) => Promise<DeleteReturnStockResponse>
 
 type UpdateClientReturnStock = (
   UpdateClientReturnData: UpdateClientReturnStockInput
@@ -158,7 +167,8 @@ type GetActiveFaconniers = (
 type GetActiveStylists = (
   seasonId: string,
   openBon: boolean,
-  closedBon: boolean
+  closedBon: boolean,
+  search?: string
 ) => Promise<GetActiveStylistsResponse>
 
 type GetActiveClients = (
@@ -176,6 +186,11 @@ type CreateBonFaconnier = (bonData: CreateBonFaconnierInput) => Promise<CreateBo
 type CreateBonStylist = (bonData: CreateBonStylistInput) => Promise<CreateBonStylistResponse>
 
 type CreateBonClient = (bonData: CreateBonClientInput) => Promise<CreateBonClientResponse>
+type CreateBonClientPassager = (
+  bonData: CreateBonClientPassagerInput
+) => Promise<CreateBonClientResponse>
+
+type GetBonsClientPassager = (seasonId: string) => Promise<GetBonClientPassagerResponse>
 
 type CreateOrderFaconnier = (
   orderData: CreateOrderFaconnierInput
@@ -347,6 +362,7 @@ type DeleteWorkplace = (workplaceId: string) => Promise<CreateWorkPlaceResponse>
 
 type CreateWorker = (workerData: Omit<CreateWorkerInput, 'id'>) => Promise<CreateWorkerResponse>
 type GetWorkers = (
+  active: string[],
   page: number,
   limit: number,
   search: string

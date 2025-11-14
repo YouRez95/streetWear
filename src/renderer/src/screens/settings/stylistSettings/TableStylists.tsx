@@ -12,7 +12,7 @@ type TableStylistsProps = {
 }
 
 export const TableStylists = ({ searchTerm, types }: TableStylistsProps) => {
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(200)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [selectedStylist, setSelectedStylist] = useState<StylistData | null>(null)

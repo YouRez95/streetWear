@@ -41,6 +41,7 @@ declare global {
       toggleBonFaconnier: ToggleBonFaconnier
       deleteBonFaconnier: DeleteBonFaconnier
       getGeneralSettings: GetGeneralSettings
+      deleteReturnStock: DeleteReturnStock
       createStylist: CreateStylist
       getStylists: GetStylists
       updateStylistStatus: UpdateStylistStatus
@@ -72,6 +73,7 @@ declare global {
       toggleBonClient: ToggleBonClient
       updateOrderClient: UpdateOrderClient
       getSummary: GetSummary
+      getInfiniteProducts: GetInfiniteProducts
       getRetardOrdersFaconnier: GetRetardOrdersFaconnier
       getReturnStock: GetReturnStock
       deleteClientReturnStock: DeleteClientReturnStock
@@ -104,6 +106,9 @@ declare global {
       getWorkerRecords: GetWorkerRecords
       getSummaryWorker: GetSummaryWorker
       cancelOrderFaconnier: CancelOrderFaconnier
+      createBonClientPassager: CreateBonClientPassager
+      getBonsClientPassager: GetBonsClientPassager
+      getActiveClientsAndPassager: GetActiveClients
     }
   }
 }

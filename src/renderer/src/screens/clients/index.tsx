@@ -1,5 +1,5 @@
 import { PaginationComponent } from '@renderer/components/pagination'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import ClientsContent from './ClientsContent'
 import ClientsHeader from './ClientsHeader'
 
@@ -9,8 +9,16 @@ export default function Clients() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
-  const [limit, setLimit] = useState(20)
+  const [limit, setLimit] = useState(200)
   const [date, setDate] = useState<'asc' | 'desc'>('asc')
+
+  const handleSetTotalPages = useCallback((total: number) => {
+    setTotalPages(total)
+  }, [])
+
+  const handleSetDate = useCallback((date: 'asc' | 'desc') => {
+    setDate(date)
+  }, [])
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden gap-4">
@@ -28,10 +36,10 @@ export default function Clients() {
               search={search}
               setSearch={setSearch}
               page={page}
-              setTotalPages={setTotalPages}
+              setTotalPages={handleSetTotalPages}
               limit={limit}
               date={date}
-              setDate={setDate}
+              setDate={handleSetDate}
             />
           </div>
         </div>

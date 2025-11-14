@@ -59,7 +59,6 @@ export default function EditRecordDialog({
       )
       return
     }
-    console.log('Submitting record:', editingRecord)
     setErrorMsg('')
     updateWeekrecordMutation(
       { recordData: editingRecord, weekId, workplaceId },

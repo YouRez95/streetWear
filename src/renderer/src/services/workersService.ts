@@ -75,9 +75,19 @@ export const workersService = {
     }
   },
 
-  getWorkers: async ({ page, limit, search }: { page: number; limit: number; search: string }) => {
+  getWorkers: async ({
+    active,
+    page,
+    limit,
+    search
+  }: {
+    active: string[]
+    page: number
+    limit: number
+    search: string
+  }) => {
     try {
-      const workers = await window.context.getWorkers(page, limit, search)
+      const workers = await window.context.getWorkers(active, page, limit, search)
       return workers
     } catch (error) {
       console.error('Error fetching workers:', error)
@@ -239,7 +249,6 @@ export const workersService = {
       const result = await window.context.getYearSummary({ year, workplaceId })
       return result
     } catch (error) {
-      console.log('error get year summary worker')
       throw error
     }
   },

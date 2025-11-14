@@ -49,9 +49,14 @@ export const stylistService = {
       throw error
     }
   },
-  getActiveStylists: async (seasonId: string, openBon: boolean, closedBon: boolean) => {
+  getActiveStylists: async (
+    seasonId: string,
+    openBon: boolean,
+    closedBon: boolean,
+    search: string = ''
+  ) => {
     try {
-      const result = await window.context.getActiveStylists(seasonId, openBon, closedBon)
+      const result = await window.context.getActiveStylists(seasonId, openBon, closedBon, search)
       return result
     } catch (error) {
       console.error('Error fetching active stylists:', error)

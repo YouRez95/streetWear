@@ -7,6 +7,7 @@ import { downloadBon, downloadExcelBon } from './services/bons'
 import {
   createAvanceClient,
   createBonClient,
+  createBonClientPassager,
   createClient,
   createMultipleOrdersClient,
   createOrderClient,
@@ -15,6 +16,8 @@ import {
   deleteClient,
   deleteOrderClient,
   getActiveClients,
+  getActiveClientsAndPassager,
+  getBonsClientPassager,
   getClients,
   getClientSummary,
   getOrdersClient,
@@ -47,12 +50,14 @@ import {
   createProduct,
   deleteProduct,
   getAllProductsStatus,
+  getInfiniteProducts,
   getProducts,
   updateProduct
 } from './services/products'
 import {
   createOrderClientFromReturnStock,
   deleteClientReturnStock,
+  deleteReturnStock,
   getReturnStock,
   getSummaryReturnStock,
   updateClientReturnStock
@@ -335,9 +340,25 @@ app.whenReady().then(async () => {
     getActiveClients(...args)
   )
 
+  // Get Active Clients and passager IPC
+  ipcMain.handle('getActiveClientsAndPassager', async (_, ...args: Parameters<GetActiveClients>) =>
+    getActiveClientsAndPassager(...args)
+  )
+
   // Create Bon Client IPC
   ipcMain.handle('createBonClient', async (_, ...args: Parameters<CreateBonClient>) =>
     createBonClient(...args)
+  )
+
+  // Create Bon Client Passager IPC
+  ipcMain.handle(
+    'createBonClientPassager',
+    async (_, ...args: Parameters<CreateBonClientPassager>) => createBonClientPassager(...args)
+  )
+
+  // Get Bon Client Passager IPC
+  ipcMain.handle('getBonsClientPassager', async (_, ...args: Parameters<GetBonsClientPassager>) =>
+    getBonsClientPassager(...args)
   )
 
   // Create Order Client IPC
@@ -414,6 +435,11 @@ app.whenReady().then(async () => {
 
   // Get Products IPC
   ipcMain.handle('getProducts', async (_, ...args: Parameters<GetProducts>) => getProducts(...args))
+
+  // Get Infinite Product IPC
+  ipcMain.handle('getInfiniteProducts', async (_, ...args: Parameters<GetInfiniteProducts>) =>
+    getInfiniteProducts(...args)
+  )
 
   // Create Product IPC
   ipcMain.handle('createProduct', async (_, ...args: Parameters<CreateProduct>) =>
@@ -522,11 +548,18 @@ app.whenReady().then(async () => {
     getReturnStock(...args)
   )
 
-  // Delete return stock
+  // Delete client return stock
   ipcMain.handle(
     'deleteClientReturnStock',
     async (_, ...args: Parameters<DeleteClientReturnStock>) => deleteClientReturnStock(...args)
   )
+
+  // Delete return stock
+  ipcMain.handle('deleteReturnStock', async (_, ...args: Parameters<DeleteReturnStock>) =>
+    deleteReturnStock(...args)
+  )
+
+  deleteReturnStock
 
   // Update return stock
   ipcMain.handle(

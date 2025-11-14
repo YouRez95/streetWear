@@ -164,7 +164,7 @@ export const CloseBonDialog = ({
                 value={code}
                 onChange={handleChangeCode}
                 placeholder="Saisir 'FERMER' pour confirmer"
-                className="h-11 border-background/30 focus:border-destructive/50 transition-colors"
+                className="h-11 border-background/30 focus:border-destructive/50 transition-colors placeholder:text-background/50"
               />
             </div>
 

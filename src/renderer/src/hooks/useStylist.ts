@@ -166,11 +166,15 @@ export function useDeleteStylist() {
   })
 }
 
-export function useActiveStylists(openBon: boolean = true, closedBon: boolean = false) {
+export function useActiveStylists(
+  openBon: boolean = true,
+  closedBon: boolean = false,
+  search: string = ''
+) {
   const { activeSeason } = useUserStore()
   const seasonId = activeSeason?.id || ''
   return useQuery({
-    queryKey: [...queryKeys.activeStylists(seasonId), openBon, closedBon],
+    queryKey: [...queryKeys.activeStylists(seasonId), openBon, closedBon, search],
     queryFn: () => {
       if (!seasonId) {
         return Promise.resolve<GetActiveStylistsResponse>({
@@ -179,7 +183,7 @@ export function useActiveStylists(openBon: boolean = true, closedBon: boolean = 
           stylists: []
         })
       }
-      return stylistService.getActiveStylists(seasonId, openBon, closedBon)
+      return stylistService.getActiveStylists(seasonId, openBon, closedBon, search)
     },
     refetchOnWindowFocus: false,
     retry: false
@@ -328,7 +332,12 @@ export function useUpdateOrderStylist() {
   const seasonId = activeSeason?.id || ''
 
   return useMutation({
-    mutationFn: ({ orderId, formData, stylistId, bonId }: Omit<UpdateOrderStylistInput, 'seasonId'>) =>
+    mutationFn: ({
+      orderId,
+      formData,
+      stylistId,
+      bonId
+    }: Omit<UpdateOrderStylistInput, 'seasonId'>) =>
       stylistService.updateOrderStylist({ bonId, stylistId, orderId, formData, seasonId }),
     onSuccess: async (data) => {
       if (data.status === 'failed') {

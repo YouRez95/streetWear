@@ -35,7 +35,13 @@ export const queryKeysWorkers = {
     search
   ],
   workersRoot: ['workers'] as const,
-  workers: (page: number, limit: number, search: string) => ['workers', page, limit, search],
+  workers: (active: string[], page: number, limit: number, search: string) => [
+    'workers',
+    active,
+    page,
+    limit,
+    search
+  ],
   workersCursorRoot: ['workers-cursor'] as const,
   workersCursor: (take: number, cursor: string, search: string) => [
     'workers-cursor',
@@ -171,10 +177,10 @@ export function useDeleteWorkplace() {
   })
 }
 
-export function useWorkers(page: number, limit: number, search = '') {
+export function useWorkers(active: string[], page: number, limit: number, search = '') {
   return useQuery({
-    queryKey: queryKeysWorkers.workers(page, limit, search),
-    queryFn: () => workersService.getWorkers({ page, limit, search }),
+    queryKey: queryKeysWorkers.workers(active, page, limit, search),
+    queryFn: () => workersService.getWorkers({ active, page, limit, search }),
     refetchOnWindowFocus: false,
     retry: false
   })

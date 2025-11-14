@@ -48,6 +48,28 @@ export const deleteClientReturnStock: DeleteClientReturnStock = async (
   }
 }
 
+export const deleteReturnStock: DeleteReturnStock = async (seasonId, returnStockId) => {
+  try {
+    const result = await apiClient.delete(
+      `/api/v1/stock-return/delete-stock/${seasonId}/${returnStockId}`
+    )
+    return result.data
+  } catch (error: any) {
+    const { status, data } = error.response
+    if (status === 400 && data.errors) {
+      return {
+        status: 'failed',
+        message: data.errors[0].message || 'Validation error'
+      }
+    }
+
+    return {
+      status: 'failed',
+      message: data.message || 'No response from server. Please try again later.'
+    }
+  }
+}
+
 export const updateClientReturnStock: UpdateClientReturnStock = async (updateOrderClientData) => {
   const { seasonId, clientReturnId, newQuantity } = updateOrderClientData
   try {
@@ -99,7 +121,7 @@ export const createOrderClientFromReturnStock: CreateOrderClientFromReturnStock 
 
   try {
     const result = await apiClient.post(
-      `/api/v1/stock-return/order/create/${seasonId}/${clientId}`,
+      `/api/v1/stock-return/order/create/${seasonId}/${clientId ?? 'passager'}`,
       restData
     )
     return result.data

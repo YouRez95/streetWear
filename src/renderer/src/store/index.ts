@@ -91,3 +91,31 @@ export const useYearStore = create<YearStore>((set) => ({
   year: null,
   setYear: (year) => set({ year: year })
 }))
+
+type ProductDialogState = {
+  selectedProduct: Product | null
+  openSheet: boolean
+  openEdit: boolean
+  openDelete: boolean
+  openTransferFac: boolean
+  openTransferClient: boolean
+  openTransferStylist: boolean
+
+  setProduct: (product: Product | null) => void
+  open: (key: keyof ProductDialogState) => void
+  close: (key: keyof ProductDialogState) => void
+}
+
+export const useProductStore = create<ProductDialogState>((set) => ({
+  selectedProduct: null,
+  openSheet: false,
+  openEdit: false,
+  openDelete: false,
+  openTransferFac: false,
+  openTransferClient: false,
+  openTransferStylist: false,
+
+  setProduct: (product) => set({ selectedProduct: product }),
+  open: (key) => set({ [key]: true }),
+  close: (key) => set({ [key]: false })
+}))

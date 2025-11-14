@@ -142,6 +142,8 @@ try {
       ipcRenderer.invoke('getReturnStock', ...args),
     deleteClientReturnStock: (...args: Parameters<DeleteClientReturnStock>) =>
       ipcRenderer.invoke('deleteClientReturnStock', ...args),
+    deleteReturnStock: (...args: Parameters<DeleteReturnStock>) =>
+      ipcRenderer.invoke('deleteReturnStock', ...args),
     updateClientReturnStock: (...args: Parameters<UpdateClientReturnStock>) =>
       ipcRenderer.invoke('updateClientReturnStock', ...args),
     getSummaryReturnStock: (...args: Parameters<GetSummaryReturnStock>) =>
@@ -195,7 +197,15 @@ try {
     getSummaryWorker: (...args: Parameters<GetSummaryWorker>) =>
       ipcRenderer.invoke('getSummaryWorker', ...args),
     cancelOrderFaconnier: (...args: Parameters<CancelOrderFaconnier>) =>
-      ipcRenderer.invoke('cancelOrderFaconnier', ...args)
+      ipcRenderer.invoke('cancelOrderFaconnier', ...args),
+    createBonClientPassager: (...args: Parameters<CreateBonClientPassager>) =>
+      ipcRenderer.invoke('createBonClientPassager', ...args),
+    getBonsClientPassager: (...args: Parameters<GetBonsClientPassager>) =>
+      ipcRenderer.invoke('getBonsClientPassager', ...args),
+    getActiveClientsAndPassager: (...args: Parameters<GetActiveClients>) =>
+      ipcRenderer.invoke('getActiveClientsAndPassager', ...args),
+    getInfiniteProducts: (...args: Parameters<GetInfiniteProducts>) =>
+      ipcRenderer.invoke('getInfiniteProducts', ...args)
   })
 } catch (error) {
   console.error('Failed to expose context:', error)

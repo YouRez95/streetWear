@@ -14,7 +14,7 @@ import { useDeleteProduct } from '@renderer/hooks/useProduct'
 import { useState } from 'react'
 
 type DeleteProductDialogProps = {
-  product: Product
+  product: Product | null
   open: boolean
   setOpen: (open: boolean) => void
 }
@@ -41,18 +41,19 @@ export function DeleteProductDialog({ product, open, setOpen }: DeleteProductDia
     }
     setError('')
 
-    if (deleteProductMutation) {
-      deleteProductMutation.mutate(product.id, {
-        onSuccess: (data) => {
-          if (data.status === 'failed') {
-            return
-          }
-          setCode('')
-          setOpen(false)
+    if (!product) return
+    deleteProductMutation.mutate(product.id, {
+      onSuccess: (data) => {
+        if (data.status === 'failed') {
+          return
         }
-      })
-    }
+        setCode('')
+        setOpen(false)
+      }
+    })
   }
+
+  if (!product) return null
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
