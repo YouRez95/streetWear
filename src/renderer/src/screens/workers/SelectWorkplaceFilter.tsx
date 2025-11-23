@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@renderer/components/ui/input'
 import { useWorkPlacesByCursor } from '@renderer/hooks/useWorkers'
-import { useWorkerStore } from '@renderer/store'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { memo, useCallback, useEffect, useState } from 'react'
 
@@ -24,7 +23,6 @@ export default function SelectWorkplaceFilter({
   placeholder = 'Choisir un atelier',
   disabled = false
 }: SelectWorkplaceFilterProps) {
-  const { setWeekId } = useWorkerStore()
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearchTerm = useDebounce(searchTerm, 500)
   const [ref, entry] = useIntersectionObserver({
@@ -75,7 +73,7 @@ export default function SelectWorkplaceFilter({
   return (
     <div className="w-64">
       <Select onValueChange={onValueChange} value={value} disabled={disabled}>
-        <SelectTrigger className="w-full data-[placeholder]:text-background/35 border border-background/50">
+        <SelectTrigger className="w-full data-[placeholder]:text-background/35 border border-background/20">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent

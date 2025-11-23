@@ -280,7 +280,7 @@ type CreateProductInput = Omit<
 > & {
   productImage: ArrayBuffer | null
   fileName: string | null
-  isReady: boolean
+  isReady?: boolean
 }
 
 type CreateProductResponse = {
@@ -479,6 +479,7 @@ type CreateOrderStylistInput = {
   priceByUnit: number
   transferQuantity: number
   date: string
+  description?: string
 }
 
 type OrderStylistData = {
@@ -505,6 +506,7 @@ type CreateOrderFaconnierInput = {
   priceByUnit: number
   transferQuantity: number
   date: string
+  description?: string
 }
 type OrderFaconnierData = {
   id: string
@@ -530,6 +532,7 @@ type CreateOrderClientInput = {
   priceByUnit: number
   transferQuantity: number
   date: string
+  description?: string
 }
 
 type CreateMultipleOrdersClientInput = {
@@ -585,6 +588,7 @@ type OrderProduct = {
   quantity_returned: number
   unit_price: number
   createdAt: string
+  description?: string
 }
 
 type OrderAvance = {
@@ -805,6 +809,7 @@ type UpdateOrderFaconnierInput = {
     newQuantityReturned: number
     price_by_unit: number
     date: string
+    description?: string
   }
 }
 
@@ -817,6 +822,7 @@ type UpdateOrderStylistInput = {
     quantity_sent: number
     price_by_unit: number
     date: string
+    description?: string
   }
 }
 
@@ -832,6 +838,7 @@ type UpdateOrderClientInput = {
     date: string
     passagerName?: string | null
     avance?: number
+    description?: string
   }
 }
 

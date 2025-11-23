@@ -79,15 +79,17 @@ export const workersService = {
     active,
     page,
     limit,
+    workplaceId,
     search
   }: {
     active: string[]
     page: number
     limit: number
+    workplaceId: string
     search: string
   }) => {
     try {
-      const workers = await window.context.getWorkers(active, page, limit, search)
+      const workers = await window.context.getWorkers(active, page, limit, workplaceId, search)
       return workers
     } catch (error) {
       console.error('Error fetching workers:', error)

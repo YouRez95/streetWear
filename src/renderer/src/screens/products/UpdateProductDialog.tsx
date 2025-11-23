@@ -2,7 +2,7 @@ import { DialogClose } from '@radix-ui/react-dialog'
 import productLogo from '@renderer/assets/icons/products-icon.svg'
 import DatePicker from '@renderer/components/datePicker'
 import { Button } from '@renderer/components/ui/button'
-import { Checkbox } from '@renderer/components/ui/checkbox'
+// Remove Checkbox import
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import { Label } from '@renderer/components/ui/label'
 import { Textarea } from '@renderer/components/ui/textarea'
 import { useUpdateProduct } from '@renderer/hooks/useProduct'
 import { getImageUrl, validateProductForm } from '@renderer/utils'
-import { Package, PackageCheck, Ruler, Scale, Upload } from 'lucide-react'
+import { Package, Ruler, Scale, Upload } from 'lucide-react' // Remove PackageCheck
 import { useEffect, useState } from 'react'
 
 type UpdateProductDialogProps = {
@@ -36,7 +36,6 @@ const initialFormData: CreateProductInput & {
   fileName: null,
   createdAt: new Date().toISOString(),
   poids: 0,
-  isReady: false,
   metrage: 0
 }
 
@@ -60,16 +59,13 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
         fileName: null,
         createdAt: product.createdAt || new Date().toISOString(),
         poids: product.poids || 0,
-        metrage: product.metrage || 0,
-        isReady:
-          product.ProductStatus.quantity_ready +
-            product.ProductStatus.quantity_with_client +
-            product.ProductStatus.quantity_returned_client ===
-          product.totalQty
+        metrage: product.metrage || 0
       })
 
       if (product.productImage) {
         setImageUrl(product.productImage)
+      } else {
+        setImageUrl(null)
       }
       setImagePreview(null)
     }
@@ -84,10 +80,7 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
     setFormData({ ...formData, [name]: parsedValue })
   }
 
-  const handleCheckboxChange = (checked: boolean) => {
-    if (error) setError(null)
-    setFormData({ ...formData, isReady: checked })
-  }
+  // Remove handleCheckboxChange function
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -132,6 +125,7 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
   if (!product) {
     return null
   }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="bg-foreground min-w-[700px]">
@@ -237,8 +231,7 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
             </div>
           </div>
 
-          {/* Product Stock & Type */}
-          {/* Stock Section with Ready Status */}
+          {/* Product Stock - Simplified */}
           <div className="bg-muted-foreground p-4 rounded-lg shadow-sm">
             <h1 className="text-base font-semibold mb-3">Gestion des stocks</h1>
             <div className="flex gap-4 items-start">
@@ -260,28 +253,7 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
                 <p className="text-xs text-background/60">Quantité totale du produit</p>
               </div>
 
-              <div className="flex-1 flex flex-col gap-3 pt-1">
-                <div className="flex items-center gap-3 p-3 bg-background/10 rounded-lg border border-background/20">
-                  <Checkbox
-                    id="isReady"
-                    checked={formData.isReady}
-                    onCheckedChange={handleCheckboxChange}
-                    className="w-5 h-5 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                  />
-                  <div className="flex-1">
-                    <Label
-                      htmlFor="isReady"
-                      className="text-base font-medium flex items-center gap-2 cursor-pointer"
-                    >
-                      <PackageCheck className="w-4 h-4" />
-                      Stock prêt
-                    </Label>
-                    <p className="text-xs text-background/60 mt-1">
-                      Cochez si la totalité du stock est disponible
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {/* Remove the isReady checkbox section entirely */}
             </div>
           </div>
 
@@ -333,6 +305,7 @@ export default function UpdateProductDialog({ product, open, setOpen }: UpdatePr
           <div className="text-base text-destructive">
             {error && <p className="text-destructive">{error}</p>}
           </div>
+
           {/* Actions */}
           <div className="flex justify-end gap-2">
             <DialogClose asChild>

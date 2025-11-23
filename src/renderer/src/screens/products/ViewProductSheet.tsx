@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/sheet'
 import { getImageUrl } from '@renderer/utils'
 import { Ruler, Scale } from 'lucide-react'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 type ViewProductSheetProps = {
   product: Product | null
@@ -35,11 +36,12 @@ export default function ViewProductSheet({
         <div className="mt-6 flex flex-col gap-6 text-background text-base pb-6">
           {/* Image */}
           <Card className="bg-muted border-none shadow-none">
-            <CardContent className="p-4">
-              <img
+            <CardContent className="p-4 flex justify-center">
+              <LazyLoadImage
+                effect="opacity"
                 src={getImageUrl(product.productImage, 'product')}
                 alt={product.name}
-                className="w-full h-[280px] object-contain rounded-lg"
+                className="w-full h-[280px] object-contain rounded-lg bg-gray-100 border"
                 onError={(e) => {
                   e.currentTarget.src = defaultProductImage
                 }}

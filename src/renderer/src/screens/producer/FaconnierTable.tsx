@@ -17,6 +17,7 @@ import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowUpDown, Download, Info, Pencil, Trash } from 'lucide-react'
 import { memo, useCallback, useEffect, useState } from 'react'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { DeleteAvanceDialog } from './DeleteAvanceDialog'
 import { DeleteOrderFaconnierDialog } from './DeleteOrderFaconnierDialog'
 import { EditOrderFaconnierDialog } from './EditOrderFaconnierDialog'
@@ -83,10 +84,11 @@ const ProductOrderRow = memo(
       <TableCell>{order.reference}</TableCell>
       <TableCell className="font-medium">
         <div className="flex items-center gap-3">
-          <img
+          <LazyLoadImage
             src={getImageUrl(order.productImage, 'product')}
+            effect="opacity"
             alt={order.id}
-            className="w-14 h-14 rounded-lg"
+            className="w-14 h-14 rounded-lg bg-gray-100 border"
             onError={(e) => {
               const target = e.currentTarget
               target.src = defaultProductImage
@@ -104,33 +106,50 @@ const ProductOrderRow = memo(
       <TableCell className="text-center">
         <StatusBadge status={order.order_status} />
       </TableCell>
-      <TableCell className="text-right pr-5 space-x-3">
-        {/* Download order */}
-        {selectedBon?.bon_number && selectedFaconnier?.name && (
+      <TableCell className="pr-5">
+        <div className=" flex justify-end items-center gap-2">
+          {/* Download order */}
+          {selectedBon?.bon_number && selectedFaconnier?.name && (
+            <Button
+              variant="ghost"
+              size={'sm'}
+              className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
+              onClick={() => onDownload(order)}
+            >
+              <Download className="w-4 h-4" />
+            </Button>
+          )}
+          {/* Description order */}
+          {order.description && (
+            <HoverCard>
+              <HoverCardTrigger className="p-2 border border-secondary/80 text-secondary cursor-pointer hover:text-secondary hover:bg-secondary/10 rounded-md">
+                <Info className="w-4 h-4" />
+              </HoverCardTrigger>
+              <HoverCardContent className="text-left mr-4 text-sm font-normal">
+                {order.description}
+              </HoverCardContent>
+            </HoverCard>
+          )}
+          {/* Edit order */}
           <Button
+            onClick={() => onEdit(order)}
             variant="ghost"
+            size={'sm'}
             className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
-            onClick={() => onDownload(order)}
           >
-            <Download className="w-4 h-4" />
+            <Pencil className="w-4 h-4" />
           </Button>
-        )}
-        {/* Edit order */}
-        <Button
-          onClick={() => onEdit(order)}
-          variant="ghost"
-          className="p-2 border border-secondary/80 text-secondary hover:text-secondary hover:bg-secondary/10 rounded-md"
-        >
-          <Pencil className="w-4 h-4" />
-        </Button>
-        {/* Delete order */}
-        <Button
-          onClick={() => onDelete(order)}
-          variant="ghost"
-          className="p-2 border border-destructive/80 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-md"
-        >
-          <Trash className="w-4 h-4" />
-        </Button>
+
+          {/* Delete order */}
+          <Button
+            size={'sm'}
+            onClick={() => onDelete(order)}
+            variant="ghost"
+            className="p-2 border border-destructive/80 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-md"
+          >
+            <Trash className="w-4 h-4" />
+          </Button>
+        </div>
       </TableCell>
     </TableRow>
   )
@@ -244,7 +263,8 @@ function FaconnierTableComponent({
     quantity_returned: 0,
     quantity_sent: 0,
     price_by_unit: 0,
-    date: ''
+    date: '',
+    description: ''
   })
   const [openDeleteOrderDialog, setOpenDeleteOrderDialog] = useState({
     open: false,
@@ -279,7 +299,8 @@ function FaconnierTableComponent({
       quantity_returned: order.quantity_returned,
       quantity_sent: order.quantity_sent,
       price_by_unit: order.unit_price,
-      date: order.createdAt
+      date: order.createdAt,
+      description: order.description
     })
   }, [])
 

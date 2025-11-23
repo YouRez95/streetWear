@@ -18,6 +18,7 @@ import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowUpDown, ChevronDown, ChevronRight, Download, Info, Pencil, Trash } from 'lucide-react'
 import { memo, useCallback, useEffect, useState } from 'react'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { DeleteAvanceClientDialog } from './DeleteAvanceClientDialog'
 import { DeleteOrderClientDialog } from './DeleteOrderClientDialog'
 import { EditOrderClientDialog } from './EditOrderClientDialog'
@@ -67,10 +68,11 @@ const ProductOrderRow = memo(
         <TableCell className="font-medium">{order.reference}</TableCell>
         <TableCell className="font-medium">
           <div className="flex items-center gap-3">
-            <img
+            <LazyLoadImage
               src={getImageUrl(order.productImage, 'product')}
               alt={order.id}
-              className="w-14 h-14 rounded-lg"
+              effect="opacity"
+              className="w-14 h-14 rounded-lg bg-gray-100 border"
               onError={(e) => {
                 const target = e.currentTarget
                 target.src = defaultProductImage
@@ -110,6 +112,16 @@ const ProductOrderRow = memo(
                   onDownload(order)
                 }}
               />
+            )}
+            {order.description && (
+              <HoverCard>
+                <HoverCardTrigger className="p-1.5 border border-secondary/80 text-secondary cursor-pointer hover:text-secondary hover:bg-secondary/10 rounded-md">
+                  <Info className="w-4 h-4" />
+                </HoverCardTrigger>
+                <HoverCardContent className="text-left mr-4 text-sm font-normal">
+                  {order.description}
+                </HoverCardContent>
+              </HoverCard>
             )}
             <Pencil
               className="w-7 h-7 cursor-pointer text-success border border-success/90 rounded-md p-1"
@@ -385,7 +397,8 @@ function ClientsTableComponent({
     price_by_unit: 0,
     date: '',
     passagerName: '',
-    avance: 0
+    avance: 0,
+    description: ''
   })
   const [openDeleteOrderDialog, setOpenDeleteOrderDialog] = useState({
     open: false,
@@ -426,7 +439,8 @@ function ClientsTableComponent({
       price_by_unit: order.unit_price,
       date: order.createdAt,
       passagerName: order.passagerName || '',
-      avance: order.avance || 0
+      avance: order.avance || 0,
+      description: order.description || ''
     })
   }, [])
 
