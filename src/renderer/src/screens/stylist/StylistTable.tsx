@@ -1,4 +1,5 @@
 import defaultProductImage from '@/assets/placeholder-image/default-product.webp'
+import ImagePreview from '@renderer/components/imagePreview/ImagePreview'
 import { Button } from '@renderer/components/ui/button'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/components/ui/hover-card'
 import {
@@ -13,11 +14,10 @@ import {
 import { useOrdersStylist } from '@renderer/hooks/useStylist'
 import { downloadBon } from '@renderer/services/bonsService'
 import { useUserStore } from '@renderer/store'
-import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
+import { formatDateToDDMMYYYY } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowUpDown, Download, Info, Pencil, Trash } from 'lucide-react'
 import { memo, useCallback, useEffect, useState } from 'react'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { DeleteAvanceStylistDialog } from './DeleteAvanceStylistDialog'
 import { DeleteOrderStylistDialog } from './DeleteOrderStylistDialog'
 import { EditOrderStylistDialog } from './EditOrderStylistDialog'
@@ -60,7 +60,7 @@ const ProductOrderRow = memo(
       <TableCell>{order.reference}</TableCell>
       <TableCell className="font-medium">
         <div className="flex items-center gap-3">
-          <LazyLoadImage
+          {/* <LazyLoadImage
             effect="opacity"
             src={getImageUrl(order.productImage, 'product')}
             alt={order.id}
@@ -69,6 +69,12 @@ const ProductOrderRow = memo(
               const target = e.currentTarget
               target.src = defaultProductImage
             }}
+          /> */}
+          <ImagePreview
+            src={order.productImage}
+            fallback={defaultProductImage}
+            alt={order.id}
+            className="w-14 h-14 rounded-lg bg-gray-100 border"
           />
           <span className="text-lg">{order.productName}</span>
         </div>
