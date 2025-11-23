@@ -8,11 +8,12 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import ImagePreview from '@renderer/components/imagePreview/ImagePreview'
 import { Badge } from '@renderer/components/ui/badge'
 import { Button } from '@renderer/components/ui/button'
 import { Progress } from '@renderer/components/ui/progress'
 import { useProducts } from '@renderer/hooks/useProduct'
-import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
+import { formatDateToDDMMYYYY } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
 import {
   ArrowUpDown,
@@ -190,14 +191,11 @@ export default memo(function ProductsTable({
                 <TableCell className="font-medium">{product.reference}</TableCell>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={getImageUrl(product.productImage, 'product')}
+                    <ImagePreview
+                      src={product.productImage}
+                      fallback={defaultProductImage}
                       alt={product.id}
-                      className="w-14 h-14 rounded-lg"
-                      onError={(e) => {
-                        const target = e.currentTarget
-                        target.src = defaultProductImage
-                      }}
+                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0 bg-gray-100 border"
                     />
                     <span className="text-lg">{product.name}</span>
                   </div>

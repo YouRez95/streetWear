@@ -1,5 +1,5 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { loginUser, logoutUser } from './services/auth'
@@ -692,6 +692,21 @@ app.whenReady().then(async () => {
   ipcMain.handle('getSummaryWorker', async (_, ...args: Parameters<GetSummaryWorker>) =>
     getSummaryWorker(...args)
   )
+
+  ipcMain.handle('show-context-menu', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)!
+
+    const menu = Menu.buildFromTemplate([{ role: 'copy' }, { role: 'paste' }, { role: 'cut' }])
+
+    menu.popup({ window: win })
+  })
+
+  ipcMain.handle('download-image', async (_, url) => {
+    const win = BrowserWindow.getFocusedWindow()
+    if (!win) return
+
+    win.webContents.downloadURL(url)
+  })
 
   createWindow()
 

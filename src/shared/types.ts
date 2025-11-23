@@ -365,6 +365,7 @@ type GetWorkers = (
   active: string[],
   page: number,
   limit: number,
+  workplaceId: string,
   search: string
 ) => Promise<{
   status: 'success' | 'failed'

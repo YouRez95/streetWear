@@ -12,6 +12,7 @@ import DatePicker from '@renderer/components/datePicker'
 import { Badge } from '@renderer/components/ui/badge'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
+import { Textarea } from '@renderer/components/ui/textarea'
 import {
   useActiveStylists,
   useCreateBonStylist,
@@ -37,6 +38,7 @@ type FormData = {
   priceByUnit: number
   bon_number: number | null
   date: string
+  description?: string
 }
 
 export default function TransferProductStylistDialog({
@@ -55,7 +57,8 @@ export default function TransferProductStylistDialog({
     transferQuantity: product.ProductStatus.raw_in_stock,
     priceByUnit: 0,
     bon_number: null,
-    date: new Date().toISOString()
+    date: new Date().toISOString(),
+    description: ''
   })
   const { mutate: createOrderStylist } = useCreateOrderStylist()
 
@@ -66,13 +69,14 @@ export default function TransferProductStylistDialog({
       transferQuantity: product.ProductStatus.raw_in_stock,
       priceByUnit: 0,
       bon_number: null,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      description: ''
     })
     setError(null)
     setSelectStylist(undefined)
   }
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (error) setError(null)
     const { name, value } = e.target
     setFormData((prevData) => ({ ...prevData, [name]: value }))
@@ -109,7 +113,8 @@ export default function TransferProductStylistDialog({
         transferQuantity: Number(formData.transferQuantity),
         priceByUnit: Number(formData.priceByUnit),
         bon_number: Number(formData.bon_number),
-        date: formData.date
+        date: formData.date,
+        description: formData.description
       },
       {
         onSuccess: (data) => {
@@ -294,6 +299,21 @@ export default function TransferProductStylistDialog({
               />
               <p className="text-xs text-gray-500">Calcul automatique</p>
             </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium text-primary">
+              Description (optionnel)
+            </Label>
+            <Textarea
+              name="description"
+              id="description"
+              value={formData.description || ''}
+              onChange={handleFormChange}
+              className="w-full border-background/30 placeholder:text-background/50 resize-none"
+              placeholder="Ajouter une description..."
+            />
           </div>
 
           {/* Bon Number Section */}

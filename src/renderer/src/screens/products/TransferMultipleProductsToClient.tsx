@@ -21,6 +21,7 @@ import { getImageUrl } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ChevronDown, PlusIcon, SearchIcon, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 type SelectedClient = GetActiveClientsResponse['clients'][0]
 
@@ -284,14 +285,15 @@ export default function TransferMultipleProductsToClient({
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <img
+                        <LazyLoadImage
                           src={getImageUrl(product.productImage, 'product')}
                           alt={product.name}
+                          effect="opacity"
                           onError={(e) => {
                             const target = e.currentTarget
                             target.src = defaultProductImage
                           }}
-                          className="w-16 h-16 object-cover rounded"
+                          className="w-16 h-16 object-cover rounded bg-gray-100 border"
                         />
                         <div>
                           <p className="font-medium">{product.name}</p>

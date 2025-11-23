@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@renderer/components/ui/alert'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
+import { Textarea } from '@renderer/components/ui/textarea'
 import { useUpdateOrderFaconnier } from '@renderer/hooks/useFaconnier'
 import { cn } from '@renderer/lib/utils'
 import { AlertCircle, Info } from 'lucide-react'
@@ -24,6 +25,7 @@ type OpenEditDialog = {
   quantity_sent: number
   price_by_unit: number
   date: string
+  description: string
 }
 
 type EditOrderFaconnierDialogProps = {
@@ -38,13 +40,15 @@ type FormData = {
   newQuantityReturned: number
   price_by_unit: number
   date: string
+  description: string
 }
 
 const initialFormData: FormData = {
   quantity_sent: 0,
   newQuantityReturned: 0,
   price_by_unit: 0,
-  date: new Date().toISOString()
+  date: new Date().toISOString(),
+  description: ''
 }
 
 const initialDialogState: OpenEditDialog = {
@@ -53,7 +57,8 @@ const initialDialogState: OpenEditDialog = {
   quantity_returned: 0,
   quantity_sent: 0,
   price_by_unit: 0,
-  date: ''
+  date: '',
+  description: ''
 }
 
 export function EditOrderFaconnierDialog({
@@ -66,7 +71,8 @@ export function EditOrderFaconnierDialog({
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const { mutate: updateOrderFaconnier, isPending } = useUpdateOrderFaconnier()
 
-  const { open, orderId, quantity_returned, quantity_sent, price_by_unit, date } = openEditDialog
+  const { open, orderId, quantity_returned, quantity_sent, price_by_unit, date, description } =
+    openEditDialog
 
   // Memoize computed values
   const totalPrice = useMemo(
@@ -88,22 +94,26 @@ export function EditOrderFaconnierDialog({
         quantity_sent: quantity_sent,
         newQuantityReturned: 0,
         price_by_unit: price_by_unit,
-        date: date
+        date: date,
+        description: description
       })
       setError(null)
     }
-  }, [open, quantity_sent, price_by_unit, date])
+  }, [open, quantity_sent, price_by_unit, date, description])
 
   // Handle form input changes
-  const handleFormChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setError(null)
-    const { name, value, type } = e.target
+  const handleFormChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setError(null)
+      const { name, value, type } = e.target
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'number' ? Number(value) : value
-    }))
-  }, [])
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'number' ? Number(value) : value
+      }))
+    },
+    []
+  )
 
   // Validate form data
   const validateForm = useCallback((): string | null => {
@@ -138,30 +148,34 @@ export function EditOrderFaconnierDialog({
       return
     }
 
+    const dataToSend = {
+      ...formData,
+      description: formData.description?.trim() ? formData.description.trim() : undefined
+    }
+
+    const finalData = {
+      bonId,
+      faconnierId,
+      orderId,
+      formData: dataToSend
+    }
+
     setError(null)
-    updateOrderFaconnier(
-      {
-        bonId,
-        faconnierId,
-        orderId,
-        formData
-      },
-      {
-        onSuccess: (data) => {
-          if (data.status === 'success') {
-            onClose(initialDialogState)
-            setFormData(initialFormData)
-            setError(null)
-          } else if (data.status === 'failed') {
-            setError(data.message || 'Une erreur est survenue')
-          }
-        },
-        onError: (error) => {
-          setError('Une erreur est survenue lors de la mise à jour')
-          console.error('Update error:', error)
+    updateOrderFaconnier(finalData, {
+      onSuccess: (data) => {
+        if (data.status === 'success') {
+          onClose(initialDialogState)
+          setFormData(initialFormData)
+          setError(null)
+        } else if (data.status === 'failed') {
+          setError(data.message || 'Une erreur est survenue')
         }
+      },
+      onError: (error) => {
+        setError('Une erreur est survenue lors de la mise à jour')
+        console.error('Update error:', error)
       }
-    )
+    })
   }, [validateForm, formData, updateOrderFaconnier, bonId, faconnierId, orderId, onClose])
 
   // Handle dialog close
@@ -281,12 +295,39 @@ export function EditOrderFaconnierDialog({
                 </div>
               </div>
             </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="description"
+                className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h7"
+                  />
+                </svg>
+                Description <span className="text-gray-400 font-normal">(optionnel)</span>
+              </Label>
+              <Textarea
+                name="description"
+                id="description"
+                className="border-gray-300 dark:border-gray-600 resize-none placeholder:text-background/30 focus:border-blue-500 focus:ring-blue-500 h-11 text-base transition-colors"
+                placeholder="Ajoutez une note ou un commentaire..."
+                value={formData.description || ''}
+                onChange={handleFormChange}
+              />
+            </div>
           </div>
 
           {/* Divider */}
           <div className="border-t border-background/20" />
 
           {/* Returns Section */}
+
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-background/90 uppercase tracking-wide">
               Gestion des retours

@@ -18,6 +18,11 @@ function App() {
     }
   }, [])
 
+  window.addEventListener('contextmenu', (e) => {
+    e.preventDefault()
+    window.context.showContextMenu()
+  })
+
   return (
     <AppLayout className="">
       <Sidebar className="flex flex-col items-center justify-center">

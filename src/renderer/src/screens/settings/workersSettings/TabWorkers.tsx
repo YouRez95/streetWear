@@ -3,7 +3,7 @@ import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import { Switch } from '@renderer/components/ui/switch'
-import { useUserStore } from '@renderer/store'
+import SelectWorkplaceFilter from '@renderer/screens/workers/SelectWorkplaceFilter'
 import { FunnelPlus, Search } from 'lucide-react'
 import { Suspense, useState } from 'react'
 import { CreateWorkerDialog } from './CreateWorkerDialog'
@@ -14,7 +14,7 @@ import TableWorker from './TableWorkers'
 export default function TabWorkers() {
   const [searchTerm, setSearchTerm] = useState('')
   const [active, setActive] = useState<string[]>(['Actif'])
-  const { userData } = useUserStore()
+  const [workplaceId, setWorkplaceId] = useState<string>('')
 
   const handleTypeChange = (type: string, checked: boolean) => {
     setActive((prev) => {
@@ -32,6 +32,10 @@ export default function TabWorkers() {
         }
       }
     })
+  }
+
+  const handleChangeWorkplaceFilter = (value: string) => {
+    setWorkplaceId(value)
   }
 
   return (
@@ -53,6 +57,8 @@ export default function TabWorkers() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+
+          <SelectWorkplaceFilter value={workplaceId} onValueChange={handleChangeWorkplaceFilter} />
 
           {/* Dialog for creating User */}
           <CreateWorkerDialog />
@@ -95,7 +101,7 @@ export default function TabWorkers() {
 
       <div className="flex-1 flex flex-col items-center">
         <Suspense fallback={<LoadingSuspense />}>
-          <TableWorker searchTerm={searchTerm} active={active} />
+          <TableWorker searchTerm={searchTerm} active={active} workplaceId={workplaceId} />
           {/* <div>Table come here</div> */}
         </Suspense>
       </div>

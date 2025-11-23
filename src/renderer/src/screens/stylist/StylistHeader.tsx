@@ -5,12 +5,12 @@ import { CreditCard, HandCoins, List, Send, Wallet, Wallet2 } from 'lucide-react
 import { JSX } from 'react'
 
 const iconMap: Record<string, JSX.Element> = {
-  totalQuantitySent: <Send className="w-6 h-6 text-muted-foreground" />,
-  totalOrderItems: <List className="w-6 h-6 text-muted-foreground" />,
-  totalValueSent: <Wallet className="w-6 h-6 text-muted-foreground" />,
-  totalAdvances: <HandCoins className="w-6 h-6 text-muted-foreground" />,
-  totalAvancesRestantes: <Wallet2 className="w-6 h-6 text-muted-foreground" />,
-  totalPaid: <CreditCard className="w-6 h-6 text-muted-foreground" />
+  totalQuantitySent: <Send className="w-4 h-4" />,
+  totalOrderItems: <List className="w-4 h-4" />,
+  totalValueSent: <Wallet className="w-4 h-4" />,
+  totalAdvances: <HandCoins className="w-4 h-4" />,
+  totalAvancesRestantes: <Wallet2 className="w-4 h-4" />,
+  totalPaid: <CreditCard className="w-4 h-4" />
 }
 
 type Stat = {
@@ -33,88 +33,105 @@ export default function StylistHeader() {
   const totalValue = dataSummary?.summary?.totalValueSent || 0
   const totalAdvances = dataSummary?.summary?.totalAdvances || 0
   const remaining = totalValue - totalAdvances
-  const percentPaid = (totalAdvances / totalValue) * 100 || 0
+  const percentPaid = totalValue > 0 ? (totalAdvances / totalValue) * 100 : 0
 
   const stats: Stat[] = [
     {
       key: 'totalOrderItems',
-      label: 'Nombre de commandes',
+      label: 'Commandes',
       value: dataSummary?.summary?.totalOrderItems || 0
     },
     {
       key: 'totalQuantitySent',
-      label: 'Quantité envoyée',
+      label: 'Envoyés',
       value: dataSummary?.summary?.totalQuantitySent || 0
     },
     {
       key: 'totalValueSent',
-      label: 'Montant total',
+      label: 'Total',
       value: totalValue
     },
     {
       key: 'totalPaid',
-      label: 'Montant payé',
+      label: 'Payé',
       value: totalAdvances,
       percentage: percentPaid
     },
     {
       key: 'totalAvancesRestantes',
-      label: 'Montant restant',
-      value: remaining
+      label: 'Reste à payer',
+      value: remaining,
+      percentage: totalValue > 0 ? (remaining / totalValue) * 100 : 0
     },
     {
       key: 'totalAdvances',
-      label: 'Avances reçues',
+      label: 'Avances',
       value: totalAdvances,
       percentage: percentPaid
     }
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-      {stats.map((stat) => {
-        const isMoney =
-          stat.key === 'totalValueSent' ||
-          stat.key === 'totalPaid' ||
-          stat.key === 'totalAvancesRestantes' ||
-          stat.key === 'totalAdvances'
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 w-full">
+      {stats.map((stat) => (
+        <div
+          key={stat.key}
+          className="relative bg-white rounded-lg p-3 shadow-xs border border-gray-100 hover:shadow-sm transition-all duration-200 group min-h-[80px]"
+        >
+          {/* Icon with subtle background */}
+          <div className="flex items-start justify-between mb-2">
+            <div
+              className={cn(
+                'p-2 rounded-lg',
+                stat.key === 'totalAvancesRestantes' && remaining > 0
+                  ? 'bg-secondary text-primary-foreground'
+                  : stat.key === 'totalAvancesRestantes'
+                    ? 'bg-secondary text-primary-foreground'
+                    : stat.key === 'totalPaid' && percentPaid >= 100
+                      ? 'bg-secondary text-primary-foreground'
+                      : 'bg-secondary text-primary-foreground'
+              )}
+            >
+              {iconMap[stat.key]}
+            </div>
 
-        const suffix =
-          stat.key === 'totalQuantitySent'
-            ? 'pcs'
-            : stat.key === 'totalOrderItems'
-              ? 'commandes'
-              : 'Dhs'
-
-        return (
-          <div
-            key={stat.key}
-            className="flex items-center gap-4 bg-foreground rounded-xl p-5 shadow-sm border min-h-24"
-          >
-            <div className="p-3 bg-secondary rounded-full">{iconMap[stat.key]}</div>
-            <div className="flex flex-col gap-0">
-              <p className="text-base text-primary/90">{stat.label}</p>
-              <div className="flex items-center gap-4">
-                <p className="text-2xl font-semibold font-bagel">
-                  {stat.value} {suffix}
-                </p>
-                {stat.percentage !== undefined && (
-                  <div
-                    className={cn(
-                      'flex items-center gap-1 p-1 px-3 mt-2 rounded-full text-sm font-medium',
-                      stat.percentage > 99.99
-                        ? 'bg-secondary/10 text-secondary'
-                        : 'bg-destructive/10 text-destructive'
-                    )}
-                  >
-                    <span>{stat.percentage.toFixed(1)}%</span>
-                  </div>
+            {/* Percentage badge - positioned top right */}
+            {stat.percentage !== undefined && (
+              <div
+                className={cn(
+                  'text-xs font-medium px-2 py-1 rounded-full',
+                  stat.percentage >= 100
+                    ? 'bg-green-100 text-green-700'
+                    : stat.percentage > 50
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-amber-100 text-amber-700'
                 )}
+              >
+                {stat.percentage.toFixed(0)}%
               </div>
+            )}
+          </div>
+
+          {/* Main content */}
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-background uppercase tracking-wide">
+              {stat.label}
+            </p>
+            <div className="flex items-baseline gap-1">
+              <p className="text-lg font-semibold text-background">
+                {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+              </p>
+              <span className="text-xs text-gray-500 font-medium">
+                {stat.key === 'totalQuantitySent'
+                  ? 'pcs'
+                  : stat.key === 'totalOrderItems'
+                    ? 'cmd'
+                    : 'Dhs'}
+              </span>
             </div>
           </div>
-        )
-      })}
+        </div>
+      ))}
     </div>
   )
 }

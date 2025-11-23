@@ -12,9 +12,10 @@ import { UpdateWorkerDialog } from './UpdateWorker'
 type TableWorkerProps = {
   searchTerm: string
   active: string[]
+  workplaceId: string
 }
 
-export default function TableWorker({ searchTerm, active }: TableWorkerProps) {
+export default function TableWorker({ searchTerm, active, workplaceId }: TableWorkerProps) {
   const [selectedWorker, setSelectedWorker] = useState<GetWorkersResponse | null>(null)
   const [dialogType, setDialogType] = useState<'update' | 'delete' | null>(null)
   const [open, setOpen] = useState(false)
@@ -28,7 +29,7 @@ export default function TableWorker({ searchTerm, active }: TableWorkerProps) {
     isError,
     error,
     isFetching
-  } = useWorkers(active, page, limit, debouncedSearchTerm)
+  } = useWorkers(active, page, limit, workplaceId, debouncedSearchTerm)
 
   useEffect(() => {
     if (workersResponse?.totalPages) {

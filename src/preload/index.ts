@@ -205,7 +205,9 @@ try {
     getActiveClientsAndPassager: (...args: Parameters<GetActiveClients>) =>
       ipcRenderer.invoke('getActiveClientsAndPassager', ...args),
     getInfiniteProducts: (...args: Parameters<GetInfiniteProducts>) =>
-      ipcRenderer.invoke('getInfiniteProducts', ...args)
+      ipcRenderer.invoke('getInfiniteProducts', ...args),
+    showContextMenu: () => ipcRenderer.invoke('show-context-menu'),
+    downloadImage: (url: string) => ipcRenderer.invoke('download-image', url)
   })
 } catch (error) {
   console.error('Failed to expose context:', error)

@@ -12,6 +12,7 @@ import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ChevronDown, ChevronRight, Pencil, Shirt, Trash, Trash2 } from 'lucide-react'
 import { Fragment, memo, useEffect, useState } from 'react'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { DeleteReturnStock } from './DeleteReturnStock'
 import TranferReturnStockToClient from './TranferReturnStockToClient'
 
@@ -109,10 +110,11 @@ export default memo(function StockReturnTable({
                   <TableCell className="font-medium">{product.reference}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <img
+                      <LazyLoadImage
+                        effect="opacity"
                         src={getImageUrl(product.productImage, 'product')}
                         alt={product.name}
-                        className="w-10 h-10 rounded-md object-cover border"
+                        className="w-10 h-10 rounded-md object-cover border bg-gray-100"
                         onError={(e) => {
                           e.currentTarget.src = defaultProductImage
                         }}
@@ -204,7 +206,7 @@ export default memo(function StockReturnTable({
                                         id: ret.passagerName
                                           ? `${ret.passagerName}-${index}`
                                           : `unknown-${index}`,
-                                        name: ret.passagerName || 'Inconnu'
+                                        name: `${ret.passagerName} (passager)` || 'Inconnu'
                                       }
 
                                   return (

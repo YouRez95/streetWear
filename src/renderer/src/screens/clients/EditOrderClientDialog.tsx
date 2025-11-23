@@ -12,10 +12,11 @@ import { Alert, AlertDescription } from '@renderer/components/ui/alert'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
+import { Textarea } from '@renderer/components/ui/textarea'
 import { useUpdateOrderClient } from '@renderer/hooks/useClients'
 import { cn } from '@renderer/lib/utils'
 import { AlertCircle, Info } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type OpenEditDialog = {
   open: boolean
@@ -26,6 +27,7 @@ type OpenEditDialog = {
   date: string
   passagerName: string
   avance: number
+  description: string
 }
 
 type EditOrderClientDialogProps = {
@@ -42,6 +44,7 @@ type FormData = {
   date: string
   passagerName?: string
   avance: number
+  description: string
 }
 
 const initialFormData: FormData = {
@@ -50,7 +53,8 @@ const initialFormData: FormData = {
   price_by_unit: 0,
   date: new Date().toISOString(),
   passagerName: '',
-  avance: 0
+  avance: 0,
+  description: ''
 }
 
 const initialDialogState: OpenEditDialog = {
@@ -61,7 +65,8 @@ const initialDialogState: OpenEditDialog = {
   price_by_unit: 0,
   date: '',
   passagerName: '',
-  avance: 0
+  avance: 0,
+  description: ''
 }
 
 export function EditOrderClientDialog({
@@ -70,8 +75,9 @@ export function EditOrderClientDialog({
   clientId,
   bonId
 }: EditOrderClientDialogProps) {
-  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>(initialFormData)
+  const [error, setError] = useState<string | null>(null)
+
   const { mutate: updateOrderClient, isPending } = useUpdateOrderClient()
 
   const {
@@ -82,41 +88,35 @@ export function EditOrderClientDialog({
     price_by_unit,
     date,
     passagerName,
-    avance
+    avance,
+    description
   } = openEditDialog
 
-  // Memoize computed values
-  const isPassagerView = useMemo(() => clientId === 'passager', [clientId])
+  /** Derived state */
+  const isPassagerView = clientId === 'passager'
 
-  const totalPrice = useMemo(
-    () => formData.quantity_sent * formData.price_by_unit,
-    [formData.quantity_sent, formData.price_by_unit]
-  )
+  const totalPrice = formData.quantity_sent * formData.price_by_unit
+  const totalQuantityReturned = quantity_returned + formData.newQuantityReturned
+  const isQuantitySentDisabled = quantity_returned > 0
 
-  const totalQuantityReturned = useMemo(
-    () => quantity_returned + formData.newQuantityReturned,
-    [quantity_returned, formData.newQuantityReturned]
-  )
-
-  const isQuantitySentDisabled = useMemo(() => quantity_returned > 0, [quantity_returned])
-
-  // Initialize form data when dialog opens
+  /** Sync dialog data on open */
   useEffect(() => {
-    if (open) {
-      setFormData({
-        quantity_sent: quantity_sent,
-        newQuantityReturned: 0,
-        price_by_unit: price_by_unit,
-        date: date,
-        passagerName: passagerName || '',
-        avance: avance
-      })
-      setError(null)
-    }
-  }, [open, quantity_sent, price_by_unit, date, passagerName])
+    if (!open) return
 
-  // Handle form input changes
-  const handleFormChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      quantity_sent,
+      newQuantityReturned: 0,
+      price_by_unit,
+      date,
+      passagerName: passagerName || '',
+      avance,
+      description: description || ''
+    })
+    setError(null)
+  }, [open])
+
+  /** Input handler */
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setError(null)
     const { name, value, type } = e.target
 
@@ -124,99 +124,70 @@ export function EditOrderClientDialog({
       ...prev,
       [name]: type === 'number' ? Number(value) : value
     }))
-  }, [])
+  }
 
-  // Validate form data
-  const validateForm = useCallback((): string | null => {
-    if (formData.quantity_sent <= 0) {
-      return 'La quantité envoyée doit être supérieure à 0'
-    }
-
-    if (formData.newQuantityReturned < 0) {
-      return 'La quantité retournée ne peut pas être négative'
-    }
-
-    if (formData.newQuantityReturned + quantity_returned > formData.quantity_sent) {
+  /** Validation */
+  const validateForm = (): string | null => {
+    if (formData.quantity_sent <= 0) return 'La quantité envoyée doit être supérieure à 0'
+    if (formData.newQuantityReturned < 0) return 'La quantité retournée ne peut pas être négative'
+    if (totalQuantityReturned > formData.quantity_sent)
       return 'La quantité retournée totale ne peut pas dépasser la quantité envoyée'
-    }
-
-    if (!formData.date) {
-      return 'Veuillez sélectionner une date'
-    }
-
-    if (formData.price_by_unit <= 0) {
-      return 'Le prix unitaire doit être supérieur à 0'
-    }
-
-    if (isPassagerView && !formData.passagerName) {
-      return 'Le nom du client passager est requis'
-    }
+    if (!formData.date) return 'Veuillez sélectionner une date'
+    if (formData.price_by_unit <= 0) return 'Le prix unitaire doit être supérieur à 0'
+    if (isPassagerView && !formData.passagerName) return 'Le nom du client passager est requis'
 
     return null
-  }, [formData, quantity_returned])
+  }
 
-  // Handle form submission
-  const handleEditOrder = useCallback(() => {
+  /** Reset & close dialog */
+  const resetDialog = () => {
+    setFormData(initialFormData)
+    setError(null)
+    onClose(initialDialogState)
+  }
+
+  /** Submit handler */
+  const handleEditOrder = () => {
     const validationError = validateForm()
-    if (validationError) {
-      setError(validationError)
-      return
+    if (validationError) return setError(validationError)
+
+    const payload = {
+      ...formData,
+      description: formData.description.trim() || undefined
     }
 
-    // Prepare submission data
-    const submissionData: FormData = {
-      ...formData
-    }
-
-    if (!isPassagerView) {
-      delete submissionData.passagerName
-    }
+    if (!isPassagerView) delete payload.passagerName
 
     updateOrderClient(
       {
         bonId,
         clientId,
         orderId,
-        formData: submissionData
+        formData: payload
       },
       {
         onSuccess: (data) => {
           if (data.status === 'success') {
-            onClose(initialDialogState)
-            setFormData(initialFormData)
-            setError(null)
-          } else if (data.status === 'failed') {
+            resetDialog()
+          } else {
             setError(data.message || 'Une erreur est survenue')
           }
         },
-        onError: (error) => {
-          setError('Une erreur est survenue lors de la mise à jour')
-          console.error('Update error:', error)
-        }
+        onError: () => setError('Une erreur est survenue lors de la mise à jour')
       }
     )
-  }, [validateForm, formData, isPassagerView, updateOrderClient, bonId, clientId, orderId, onClose])
+  }
 
-  // Handle dialog close
-  const handleClose = useCallback(() => {
-    setFormData(initialFormData)
-    setError(null)
-    onClose(initialDialogState)
-  }, [onClose])
-
-  // Handle Enter key press
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' && !isPending) {
-        e.preventDefault()
-        handleEditOrder()
-      }
-    },
-    [handleEditOrder, isPending]
-  )
+  /** Allow pressing Enter */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isPending) {
+      e.preventDefault()
+      handleEditOrder()
+    }
+  }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={resetDialog}>
       <DialogContent
         className="max-w-2xl bg-foreground rounded-xl p-6 shadow-lg border"
         onKeyDown={handleKeyDown}
@@ -228,192 +199,33 @@ export function EditOrderClientDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {/* --- CONTENT --- */}
         <div className="space-y-6 py-4">
-          {/* Order Details Section */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-background/90 uppercase tracking-wide">
-              Détails de la commande
-            </h3>
+          {/* --- ORDER DETAILS --- */}
+          <OrderDetailsSection
+            formData={formData}
+            handleFormChange={handleFormChange}
+            isQuantitySentDisabled={isQuantitySentDisabled}
+            passagerName={passagerName}
+            isPassagerView={isPassagerView}
+            totalPrice={totalPrice}
+            quantity_returned={quantity_returned}
+            date={formData.date}
+            setFormData={setFormData}
+          />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Quantity Sent */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="quantity-sent"
-                  className="text-background text-sm font-medium flex items-center gap-2"
-                >
-                  Quantité envoyée
-                  {isQuantitySentDisabled && (
-                    <span className="text-xs text-orange-500 font-normal">(Non modifiable)</span>
-                  )}
-                </Label>
-                <Input
-                  name="quantity_sent"
-                  id="quantity-sent"
-                  className={cn(
-                    'border-background/30 focus:border-background/50 transition-colors',
-                    isQuantitySentDisabled && 'bg-muted cursor-not-allowed'
-                  )}
-                  type="number"
-                  min="1"
-                  value={formData.quantity_sent || ''}
-                  onChange={handleFormChange}
-                  disabled={isQuantitySentDisabled}
-                  placeholder="Entrez la quantité"
-                />
-                {isQuantitySentDisabled && (
-                  <p className="text-xs text-background/60 flex items-start gap-1">
-                    <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                    <span>
-                      La quantité ne peut pas être modifiée car des retours ont déjà été enregistrés
-                    </span>
-                  </p>
-                )}
-              </div>
-
-              {/* Price by Unit */}
-              <div className="space-y-2">
-                <Label htmlFor="price-by-unit" className="text-background text-sm font-medium">
-                  Prix unitaire (dh)
-                </Label>
-                <Input
-                  name="price_by_unit"
-                  id="price-by-unit"
-                  className="border-background/30 focus:border-background/50 transition-colors"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.price_by_unit || ''}
-                  onChange={handleFormChange}
-                  placeholder="0.00"
-                />
-              </div>
-
-              {/* Total Price (Read-only) */}
-              <div className="space-y-2">
-                <Label htmlFor="total-price" className="text-background text-sm font-medium">
-                  Total (dh)
-                </Label>
-                <Input
-                  name="total_price"
-                  id="total-price"
-                  className="border-background/30 bg-muted font-semibold"
-                  type="text"
-                  readOnly
-                  value={totalPrice.toFixed(2)}
-                />
-              </div>
-
-              {/* Date */}
-              <div className="space-y-2">
-                <Label htmlFor="date" className="text-background text-sm font-medium">
-                  Date de la commande
-                </Label>
-                <DatePicker setFormData={setFormData} date={formData.date} />
-              </div>
-            </div>
-
-            {/* Passager Name (if applicable) */}
-            {isPassagerView && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="passager-name" className="text-background text-sm font-medium">
-                    Nom du client passager
-                  </Label>
-                  <Input
-                    name="passagerName"
-                    id="passager-name"
-                    className="border-background/30 focus:border-background/50 transition-colors"
-                    type="text"
-                    value={formData.passagerName || ''}
-                    onChange={handleFormChange}
-                    placeholder={passagerName || 'Nom du client'}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="avance" className="text-background text-sm font-medium">
-                    Nouveau avance (dh)
-                  </Label>
-                  <Input
-                    name="avance"
-                    id="avance"
-                    className="border-background/30 focus:border-background/50 transition-colors"
-                    type="number"
-                    value={formData.avance || ''}
-                    onChange={handleFormChange}
-                    placeholder={'0.00'}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Divider */}
           <div className="border-t border-background/20" />
 
-          {/* Returns Section */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-background/90 uppercase tracking-wide">
-              Gestion des retours
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* New Quantity Returned */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="new-quantity-returned"
-                  className="text-background text-sm font-medium"
-                >
-                  Nouvelle quantité retournée
-                </Label>
-                <Input
-                  type="number"
-                  name="newQuantityReturned"
-                  id="new-quantity-returned"
-                  className="border-background/30 focus:border-background/50 transition-colors"
-                  onChange={handleFormChange}
-                  value={formData.newQuantityReturned || ''}
-                  min="0"
-                  max={formData.quantity_sent - quantity_returned}
-                  placeholder="0"
-                />
-                <p className="text-xs text-background/60">
-                  Cette quantité sera ajoutée aux retours précédents
-                </p>
-              </div>
-
-              {/* Total Quantity Returned (Read-only) */}
-              <div className="space-y-2">
-                <Label htmlFor="total-returned" className="text-background text-sm font-medium">
-                  Total quantité retournée
-                </Label>
-                <Input
-                  type="text"
-                  id="total-returned"
-                  className="border-background/30 bg-muted font-semibold"
-                  readOnly
-                  value={totalQuantityReturned}
-                />
-                <p className="text-xs text-background/60">
-                  Précédent: {quantity_returned} + Nouveau: {formData.newQuantityReturned}
-                </p>
-              </div>
-            </div>
-
-            {/* Return Warning */}
-            {totalQuantityReturned > 0 && totalQuantityReturned <= formData.quantity_sent && (
-              <Alert className="bg-orange-50 border-orange-200">
-                <AlertDescription className="text-orange-800 mt-1.5">
-                  <strong>Quantité restante:</strong>{' '}
-                  {formData.quantity_sent - totalQuantityReturned} unité(s)
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
+          {/* --- RETURNS --- */}
+          <ReturnsSection
+            formData={formData}
+            handleFormChange={handleFormChange}
+            totalQuantityReturned={totalQuantityReturned}
+            quantity_returned={quantity_returned}
+          />
         </div>
 
-        {/* Error Display */}
+        {/* Error */}
         {error && (
           <Alert variant="destructive" className="mb-4 flex items-center gap-2">
             <AlertCircle className="h-4 w-4" />
@@ -424,26 +236,156 @@ export function EditOrderClientDialog({
         {/* Footer */}
         <DialogFooter className="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:justify-end">
           <DialogClose asChild>
-            <Button
-              variant="ghost"
-              className="border border-background/30 hover:bg-background/5"
-              disabled={isPending}
-            >
+            <Button variant="ghost" disabled={isPending}>
               Annuler
             </Button>
           </DialogClose>
           <Button onClick={handleEditOrder} disabled={isPending} className="min-w-[140px]">
-            {isPending ? (
-              <>
-                <span className="animate-spin mr-2">⏳</span>
-                Modification...
-              </>
-            ) : (
-              'Modifier la commande'
-            )}
+            {isPending ? 'Modification…' : 'Modifier la commande'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function OrderDetailsSection({
+  formData,
+  handleFormChange,
+  isQuantitySentDisabled,
+  passagerName,
+  isPassagerView,
+  totalPrice,
+  date,
+  setFormData
+}: any) {
+  return (
+    <div className="space-y-4">
+      <h3 className="text-sm font-semibold text-background/90 uppercase tracking-wide">
+        Détails de la commande
+      </h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Quantity Sent */}
+        <div className="space-y-2">
+          <Label className="text-background text-sm font-medium flex items-center gap-2">
+            Quantité envoyée
+            {isQuantitySentDisabled && (
+              <span className="text-xs text-orange-500">(Non modifiable)</span>
+            )}
+          </Label>
+          <Input
+            name="quantity_sent"
+            type="number"
+            disabled={isQuantitySentDisabled}
+            value={formData.quantity_sent}
+            onChange={handleFormChange}
+            className={cn(isQuantitySentDisabled && 'bg-muted cursor-not-allowed')}
+          />
+          {isQuantitySentDisabled && (
+            <p className="text-xs text-background/60 flex items-start gap-1">
+              <Info className="w-3 h-3 mt-0.5" />
+              La quantité ne peut pas être modifiée car des retours existent
+            </p>
+          )}
+        </div>
+
+        {/* Price by Unit */}
+        <div className="space-y-2">
+          <Label className="text-background text-sm font-medium">Prix unitaire (dh)</Label>
+          <Input
+            name="price_by_unit"
+            type="number"
+            step="0.01"
+            value={formData.price_by_unit}
+            onChange={handleFormChange}
+          />
+        </div>
+
+        {/* Total price */}
+        <div className="space-y-2">
+          <Label className="text-background text-sm font-medium">Total (dh)</Label>
+          <Input readOnly value={totalPrice.toFixed(2)} className="bg-muted font-semibold" />
+        </div>
+
+        {/* Date */}
+        <div className="space-y-2">
+          <Label className="text-background text-sm font-medium">Date</Label>
+          <DatePicker date={date} setFormData={setFormData} />
+        </div>
+      </div>
+
+      {/* Passager inputs */}
+      {isPassagerView && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-background text-sm font-medium">Nom du passager</Label>
+            <Input
+              name="passagerName"
+              value={formData.passagerName}
+              onChange={handleFormChange}
+              placeholder={passagerName || 'Nom du client'}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-background text-sm font-medium">Nouvelle avance (dh)</Label>
+            <Input
+              name="avance"
+              type="number"
+              value={formData.avance}
+              onChange={handleFormChange}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Description */}
+      <div className="space-y-2">
+        <Label className="text-sm font-semibold">Description (optionnel)</Label>
+        <Textarea
+          name="description"
+          value={formData.description}
+          onChange={handleFormChange}
+          className="resize-none h-11"
+        />
+      </div>
+    </div>
+  )
+}
+
+function ReturnsSection({
+  formData,
+  handleFormChange,
+  totalQuantityReturned,
+  quantity_returned
+}: any) {
+  return (
+    <div className="space-y-4">
+      <h3 className="text-sm font-semibold text-background/90 uppercase tracking-wide">
+        Gestion des retours
+      </h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* New returned qty */}
+        <div className="space-y-2">
+          <Label className="text-background text-sm font-medium">Nouvelle quantité retournée</Label>
+          <Input
+            type="number"
+            name="newQuantityReturned"
+            value={formData.newQuantityReturned}
+            onChange={handleFormChange}
+            min="0"
+            max={formData.quantity_sent - quantity_returned}
+          />
+        </div>
+
+        {/* Total */}
+        <div className="space-y-2">
+          <Label className="text-background text-sm font-medium">Total quantité retournée</Label>
+          <Input readOnly value={totalQuantityReturned} className="bg-muted font-semibold" />
+        </div>
+      </div>
+    </div>
   )
 }

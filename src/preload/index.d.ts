@@ -109,6 +109,8 @@ declare global {
       createBonClientPassager: CreateBonClientPassager
       getBonsClientPassager: GetBonsClientPassager
       getActiveClientsAndPassager: GetActiveClients
+      showContextMenu: () => void
+      downloadImage: (url: string) => void
     }
   }
 }
