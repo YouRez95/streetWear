@@ -1,4 +1,5 @@
 import defaultProductImage from '@/assets/placeholder-image/default-product.webp'
+import ImagePreview from '@renderer/components/imagePreview/ImagePreview'
 import { Badge } from '@renderer/components/ui/badge'
 import { Button } from '@renderer/components/ui/button'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/components/ui/hover-card'
@@ -14,11 +15,10 @@ import {
 import { useOrdersClient } from '@renderer/hooks/useClients'
 import { downloadBon, downloadDailyBon } from '@renderer/services/bonsService'
 import { useUserStore } from '@renderer/store'
-import { formatDateToDDMMYYYY, getImageUrl } from '@renderer/utils'
+import { formatDateToDDMMYYYY } from '@renderer/utils'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowUpDown, ChevronDown, ChevronRight, Download, Info, Pencil, Trash } from 'lucide-react'
 import { memo, useCallback, useEffect, useState } from 'react'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { DeleteAvanceClientDialog } from './DeleteAvanceClientDialog'
 import { DeleteOrderClientDialog } from './DeleteOrderClientDialog'
 import { EditOrderClientDialog } from './EditOrderClientDialog'
@@ -68,7 +68,7 @@ const ProductOrderRow = memo(
         <TableCell className="font-medium">{order.reference}</TableCell>
         <TableCell className="font-medium">
           <div className="flex items-center gap-3">
-            <LazyLoadImage
+            {/* <LazyLoadImage
               src={getImageUrl(order.productImage, 'product')}
               alt={order.id}
               effect="opacity"
@@ -77,6 +77,12 @@ const ProductOrderRow = memo(
                 const target = e.currentTarget
                 target.src = defaultProductImage
               }}
+            /> */}
+            <ImagePreview
+              src={order.productImage}
+              fallback={defaultProductImage}
+              alt={order.id}
+              className="w-14 h-14 rounded-lg bg-gray-100 border"
             />
             <span className="text-lg">{order.productName}</span>
           </div>
